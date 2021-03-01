@@ -7,23 +7,33 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "npm-run-all --parallel watch:server watch:build",
-    "watch:server": "nodemon \"./build/bundle.js\" --watch \"./build\" ",
-    "watch:build": "webpack --watch"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.11",
-    "@types/node": "^14.14.31",
-    "deepmerge": "^4.2.2",
-    "npm-run-all": "^4.1.1",
-    "ts-loader": "^8.0.17",
-    "tslint": "^6.1.3",
-    "typescript": "^4.2.2",
-    "webpack": "^5.24.2",
-    "webpack-cli": "^4.5.0"
+    "start": "node src/app.js",
+    "watch": "nodemon src/app.js",
+    "lint": "eslint src --ext js --color",
+    "lint-fix": "eslint src --ext js --color --fix"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "fs-extra": "^9.1.0",
+    "join-path": "^1.1.1",
+    "ldapjs": "^2.2.4",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.1",
+    "p-limit": "^3.1.0",
+    "url-search-params-polyfill": "^8.1.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "eslint": "^7.21.0",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0"
   }
 }
