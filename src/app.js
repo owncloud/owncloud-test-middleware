@@ -70,7 +70,8 @@ app.use("/execute", async (req, res) => {
         `Could not find the matching step definition for "${pattern}"${
           table.length ? " with datatable" : ""
         }`
-      ).end();
+      )
+      .end();
   }
 });
 
