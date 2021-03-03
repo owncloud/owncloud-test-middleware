@@ -1,5 +1,5 @@
 const { client } = require("../config.js");
-const { When, Given, Then } = require("../suite");
+const { When, Given, Then } = require("../context");
 const assert = require("assert");
 const { URLSearchParams } = require("url");
 require("url-search-params-polyfill");

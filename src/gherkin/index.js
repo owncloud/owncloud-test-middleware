@@ -42,7 +42,7 @@ class StepDef {
   }
 }
 
-class Suite {
+class TestContext {
   constructor() {
     this.steps = [];
     this.afterSteps = [];
@@ -139,4 +139,4 @@ function verifyMatchParams(pattern) {
   return { pattern, data };
 }
 
-module.exports = { Token, Step, StepDef, Suite };
+module.exports = { Token, Step, StepDef, TestContext };

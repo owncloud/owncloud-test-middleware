@@ -1,5 +1,5 @@
 const { client } = require("../config.js");
-const { After, Given, Then, When } = require("../suite");
+const { After, Given, Then, When } = require("../context");
 const webdavHelper = require("../helpers/webdavHelper");
 const httpHelper = require("../helpers/httpHelper");
 const backendHelper = require("../helpers/backendHelper");

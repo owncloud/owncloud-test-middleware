@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 const assert = require("assert");
-const { Given, Then } = require("../suite");
+const { Given, Then } = require("../context");
 const webdav = require("../helpers/webdavHelper");
 const { move } = require("../helpers/webdavHelper");
 const path = require("../helpers/path");

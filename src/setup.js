@@ -1,5 +1,5 @@
 const { client } = require("./config.js");
-const { Before, After } = require("./suite/index.js");
+const { Before, After } = require("./context/index.js");
 const {
   rollbackConfigs,
   setConfigs,

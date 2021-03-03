@@ -1,5 +1,5 @@
 const { client } = require("../config.js");
-const { Given } = require("../suite");
+const { Given } = require("../context");
 const httpHelper = require("../helpers/httpHelper");
 const assert = require("assert");
 const util = require("util");

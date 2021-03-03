@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const { Step, Token } = require("./gherkin/index.js");
-const { suite } = require("./suite/index.js");
+const { testContext } = require("./context/index.js");
 
 // Register new contexts here
 require("./setup.js");
@@ -27,13 +27,14 @@ app.use("/execute", async (req, res) => {
   if (req.method !== "POST") {
     res.writeHead(405).end();
   }
-  let { pattern, table, token } = req.body;
-  if (!token) {
-    token = Token.GIVEN;
+  let { step, table } = req.body;
+  if (!step) {
+    return res.status(400).send("Step needs to be provided")
   }
+  let token = step.substr(0,step.indexOf(' '));
+  const pattern = step.substr(step.indexOf(' ')+1);
+
   token = token.toUpperCase();
-  console.log(token);
-  console.log(Object.keys(Token));
   if (!Object.keys(Token).includes(token)) {
     return res.status(400).send("invalid token type");
   }
@@ -52,12 +53,12 @@ app.use("/execute", async (req, res) => {
     }
   }
 
-  const step = new Step(token, pattern, table);
-  const stepDef = suite.getMatch(step);
+  const reqStep = new Step(token, pattern, table);
+  const stepDef = testContext.getMatch(reqStep);
 
   if (stepDef) {
     try {
-      await stepDef.run(...step.data);
+      await stepDef.run(...reqStep.data);
       return res.writeHead(200).end();
     } catch (e) {
       console.log(e);
@@ -80,7 +81,7 @@ app.use("/init", async (req, res) => {
     res.writeHead(405).end();
   }
   try {
-    await suite.setup();
+    await testContext.setup();
     res.writeHead(200);
   } catch (e) {
     res.status(400).send(e.stack);
@@ -93,7 +94,7 @@ app.use("/cleanup", async (req, res) => {
     res.writeHead(405).end();
   }
   try {
-    await suite.cleanup();
+    await testContext.cleanup();
     res.writeHead(200);
   } catch (e) {
     res.status(400).send(e.stack);

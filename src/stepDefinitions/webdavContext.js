@@ -1,4 +1,4 @@
-const { Given, Then } = require("../suite");
+const { Given, Then } = require("../context");
 require("url-search-params-polyfill");
 const httpHelper = require("../helpers/httpHelper");
 const backendHelper = require("../helpers/backendHelper");

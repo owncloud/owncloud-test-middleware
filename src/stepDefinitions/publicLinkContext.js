@@ -1,4 +1,4 @@
-const { When, Then } = require("../suite");
+const { When, Then } = require("../context");
 require("url-search-params-polyfill");
 const sharingHelper = require("../helpers/sharingHelper");
 const assert = require("assert");

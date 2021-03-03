@@ -1,5 +1,5 @@
 const { client } = require("../config.js");
-const { Given, After } = require("../suite");
+const { Given, After } = require("../context");
 const fs = require("fs-extra");
 require("url-search-params-polyfill");
 const httpHelper = require("../helpers/httpHelper");
