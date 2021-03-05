@@ -41,6 +41,7 @@ Feature: test feature
 
   Background:
     Given in the server user "Alice" has been created with default attributes
+    And in the server user "Alice" has created folder "new folder"
   
   Scenario: ...
 ```
@@ -84,3 +85,41 @@ Given(/^in the server (.*)$/, handler);
 **notes**
 - You will need to create a seperate matcher if you want to send data tables because cucumber will not match same step with optional datatable.
 - Since most of the test runner state such as list of users created by the testrunner are stored in the middleware, no need to remember them in the testrunner iteself.
+
+### Config
+#### Server specific config variables
+
+| setting | meaning | default |
+|-|-|-|
+| `HOST` | Host for the middleware server | localhost |
+| `PORT` | Port for the middleware server | 3000 |
+
+#### Test Specific config variables
+
+| setting | meaning | default |
+|-|-|-|
+| `BACKEND_HOST`      | ownCloud server URL (or reva service url for running with OCIS) | http://localhost:8080 |
+| `BACKEND_USERNAME` | ownCloud administrator username | admin                 |
+| `BACKEND_PASSWORD` | ownCloud administrator password  | admin                 |
+| `REMOTE_BACKEND_HOST` | ownCloud remote server URL | http://localhost:8080 |
+| `RUN_ON_OCIS` | Running the tests using the OCIS backend | false |
+| `OCIS_REVA_DATA_ROOT` | Data directory of OCIS  | /var/tmp/reva |
+| `OCIS_SKELETON_DIR` | Skeleton files directory for new users | - |
+
+#### Ldap Specific config variables
+| setting | meaning | default |
+| -- | -- | -- |
+| `RUN_WITH_LDAP` | use LDAP user backend | false |
+| `LDAP_SERVER_URL`  | Url of the ldap server | ldap://127.0.0.1 |
+| `LDAP_ADMIN_PASSWORD`  | admin password of the ldap server | admin |
+| `LDAP_BASE_DN` | base don of the admin server | cn=admin,dc=owncloud,dc=com |
+
+### Starting the server
+To start the middleware server use following command
+```
+yarn start
+```
+This command assumes that your backend server is running on `http://localhost:8080/` for oc10 (or `https://localhost:9200` when `RUN_WITH_OCIS` is set). If your backend is running on different address use.
+```
+BACKEND_HOST=http://localhost/owncloud-server yarn start
+```
