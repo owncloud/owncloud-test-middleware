@@ -138,7 +138,7 @@ Then(
     const fullPathOfLocalFile = client.globals.filesForUpload + localFile;
     return webdavHelper
       .download(userId, remoteFile)
-      .then((body) => assertContentOFLocalFileIs(fullPathOfLocalFile, body));
+      .then((body) => assertContentOfLocalFileIs(fullPathOfLocalFile, body));
   }
 );
 
@@ -148,35 +148,35 @@ Then(
     const fullPathOfLocalFile = client.globals.filesForUpload + localFile;
     return webdavHelper
       .download(userId, remoteFile)
-      .then((body) => assertContentOFLocalFileIsNot(fullPathOfLocalFile, body));
+      .then((body) => assertContentOfLocalFileIsNot(fullPathOfLocalFile, body));
   }
 );
 
-const assertContentOFLocalFileIs = function (
-  fullPathOflocalFile,
+const assertContentOfLocalFileIs = function (
+  fullPathOfLocalFile,
   expectedContent
 ) {
-  const actualContent = fs.readFileSync(fullPathOflocalFile, {
+  const actualContent = fs.readFileSync(fullPathOfLocalFile, {
     encoding: "utf-8",
   });
   return client.assert.strictEqual(
     actualContent,
     expectedContent,
-    'asserting content of local file "' + fullPathOflocalFile + '"'
+    'asserting content of local file "' + fullPathOfLocalFile + '"'
   );
 };
 
-const assertContentOFLocalFileIsNot = function (
-  fullPathOflocalFile,
+const assertContentOfLocalFileIsNot = function (
+  fullPathOfLocalFile,
   expectedContent
 ) {
-  const actualContent = fs.readFileSync(fullPathOflocalFile, {
+  const actualContent = fs.readFileSync(fullPathOfLocalFile, {
     encoding: "utf-8",
   });
   return client.assert.notEqual(
     actualContent,
     expectedContent,
-    'asserting content of local file "' + fullPathOflocalFile + '"'
+    'asserting content of local file "' + fullPathOfLocalFile + '"'
   );
 };
 
