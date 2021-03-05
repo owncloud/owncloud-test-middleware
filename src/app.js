@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const { Step, Token } = require("./gherkin/index.js");
+const { Step, Token, Table } = require("./gherkin/index.js");
 const { testContext } = require("./context/index.js");
 
 // Register new contexts here
@@ -39,26 +39,21 @@ app.use("/execute", async (req, res) => {
     return res.status(400).send("invalid token type");
   }
 
-  if (!table) {
-    table = [];
-  }
-
-  if (!Array.isArray(table)) {
-    return res.status(400).send("invalid table, table must be array type");
-  }
-
-  for (const item of table) {
-    if (!Array.isArray(item)) {
-      return res.status(400).send("invalid table, table must be 2D array");
-    }
+  if (table) {
+    table = new Table(table);
   }
 
   const reqStep = new Step(token, pattern, table);
+  console.log(reqStep)
   const stepDef = testContext.getMatch(reqStep);
 
   if (stepDef) {
     try {
-      await stepDef.run(...reqStep.data);
+      const args = [...reqStep.data]
+      if (table) {
+        args.push(table)
+      }
+      await stepDef.run(...args);
       return res.writeHead(200).end();
     } catch (e) {
       console.log(e);

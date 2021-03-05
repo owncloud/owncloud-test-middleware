@@ -248,6 +248,7 @@ Given("group {string} has been created", function (groupId) {
 });
 
 Given("these groups have been created:", function (dataTable) {
+  console.log(dataTable.rows());
   return Promise.all(
     dataTable.rows().map((groupId) => {
       return deleteGroup(groupId.toString()).then(() =>
