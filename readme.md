@@ -3,9 +3,9 @@
 This is a middleware server for testing owncloud (owncloud10 or OCIS) with different Clients. This server handles the operations which are required to "get the server to a certain state"
 
 ### How it works
-Since most tests in owncloud are written in gherkin, the middleware server accepts gherkin step, parses it and runs the appropriate code to get the server to a certainstate.
+Since most tests in owncloud are written in gherkin, the middleware server accepts a gherkin step, parses it and runs the appropriate code to get the server to a certain state.
 
-for eg. If we want to run a gherkin step `Given user "Alice" has been created with default attributes`, the wen send this step to the middleware server which runs it and creates the user on the oc server with all necessary default attributes (displayname, email etc.) and also stores the user so that we can cleanup after the test is complete.
+For example, If we want to run a gherkin step `Given user "Alice" has been created with default attributes`, the wen send this step to the middleware server which runs it and creates the user on the oc server with all necessary default attributes (displayname, email etc.) and also stores the user so that we can cleanup after the test is complete.
 
 ### Endpoints
 - POST /init
@@ -30,8 +30,8 @@ for eg. If we want to run a gherkin step `Given user "Alice" has been created wi
     ```
 
 ### Integration with test frameworks
-The middleware service is desiged to used with the gherkin test runner such as cucumber and behat. In order to integrate this service with the tests suite, we need to find a way to capture the steps that needs to be run in the middleware. Most test runners allow use of regex in the matching of the stepdefinition. We can use any regex rule to match all the steps that needs to run in the middleware. you can caputure them at once and send them to the middleware service.
-for eg. for all the steps you want to run in the middleware start them with `in the server`, then you can use regex `/^in the server (.*)$/` to capture all the steps
+The middleware service is designed to used with the gherkin test runner such as cucumber and behat. In order to integrate this service with the test suite, we need to find a way to capture the steps that need to be run in the middleware. Most test runners allow use of regex in the matching of the step definition. We can use any regex rule to match all the steps that need to run in the middleware. you can capture them at once and send them to the middleware service.
+for example, for all the steps you want to run in the middleware start them with `in the server`, then you can use regex `/^in the server (.*)$/` to capture all the steps
 
 eg. Cucumber Integration
 
@@ -83,8 +83,8 @@ Given(/^in the server (.*)$/, handler);
 ```
 
 **notes**
-- You will need to create a seperate matcher if you want to send data tables because cucumber will not match same step with optional datatable.
-- Since most of the test runner state such as list of users created by the testrunner are stored in the middleware, no need to remember them in the testrunner iteself.
+- You will need to create a separate matcher if you want to send data tables because cucumber will not match the same step with an optional datatable.
+- Since most of the test runner state such as the list of users created by the test runner are stored in the middleware, there is no need to remember them in the test runner itself.
 
 ### Config
 #### Server specific config variables
@@ -112,14 +112,14 @@ Given(/^in the server (.*)$/, handler);
 | `RUN_WITH_LDAP` | use LDAP user backend | false |
 | `LDAP_SERVER_URL`  | Url of the ldap server | ldap://127.0.0.1 |
 | `LDAP_ADMIN_PASSWORD`  | admin password of the ldap server | admin |
-| `LDAP_BASE_DN` | base don of the admin server | cn=admin,dc=owncloud,dc=com |
+| `LDAP_BASE_DN` | base DN of the admin server | cn=admin,dc=owncloud,dc=com |
 
 ### Starting the server
-To start the middleware server use following command
+To start the middleware server use the following command
 ```
 yarn start
 ```
-This command assumes that your backend server is running on `http://localhost:8080/` for oc10 (or `https://localhost:9200` when `RUN_WITH_OCIS` is set). If your backend is running on different address use.
+This command assumes that your backend server is running on `http://localhost:8080/` for oc10 (or `https://localhost:9200` when `RUN_WITH_OCIS` is set). If your backend is running on a different address use:
 ```
 BACKEND_HOST=http://localhost/owncloud-server yarn start
 ```
