@@ -20,8 +20,8 @@ const app = express();
 app.use(bodyParser.json());
 
 // Configuration
-const PORT = 3000;
-const HOST = "localhost";
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "localhost";
 
 app.use("/execute", async (req, res) => {
   if (req.method !== "POST") {
@@ -29,10 +29,10 @@ app.use("/execute", async (req, res) => {
   }
   let { step, table } = req.body;
   if (!step) {
-    return res.status(400).send("Step needs to be provided")
+    return res.status(400).send("Step needs to be provided");
   }
-  let token = step.substr(0,step.indexOf(' '));
-  const pattern = step.substr(step.indexOf(' ')+1);
+  let token = step.substr(0, step.indexOf(" "));
+  const pattern = step.substr(step.indexOf(" ") + 1);
 
   token = token.toUpperCase();
   if (!Object.keys(Token).includes(token)) {
