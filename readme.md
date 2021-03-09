@@ -12,21 +12,21 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
     
     reset the server step and start a test scenario execution
     ```
-    curl -XPOST http:/localhost:3000/init
+    curl -XPOST http://localhost:3000/init
     ```
 
 - POST /execute
 
     execute a gherkin step
     ```
-    curl -XPOST http:/localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes"}' -H "Content-Type: application/json"
+    curl -XPOST http://localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes"}' -H "Content-Type: application/json"
     ```
 
 - POST /cleanup
 
     cleanup the middleware state and the owncloud server
     ```
-    curl -XPOST http:/localhost:3000/cleanup
+    curl -XPOST http://localhost:3000/cleanup
     ```
 
 ### Integration with test frameworks
