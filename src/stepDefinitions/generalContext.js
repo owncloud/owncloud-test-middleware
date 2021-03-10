@@ -9,7 +9,7 @@ const occHelper = require("../helpers/occHelper");
 
 const getConfigJsonContent = function (fullPathOfConfigFile) {
   if (!fs.existsSync(fullPathOfConfigFile)) {
-    throw Error("Could not find configfile");
+    throw Error("Could not find config file");
   }
   const rawdata = fs.readFileSync(fullPathOfConfigFile);
   return JSON.parse(rawdata);
