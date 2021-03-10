@@ -80,7 +80,6 @@ async function getConfigs() {
 
 async function cacheConfigs(server) {
   config[server] = await getConfigs();
-  console.log(config);
   return config;
 }
 

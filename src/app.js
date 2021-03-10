@@ -44,9 +44,9 @@ app.use("/execute", async (req, res) => {
   }
 
   const reqStep = new Step(token, pattern, table);
-  console.log(reqStep)
   const stepDef = testContext.getMatch(reqStep);
 
+  console.log("Executing new step:\n", reqStep)
   if (stepDef) {
     try {
       const args = [...reqStep.data]

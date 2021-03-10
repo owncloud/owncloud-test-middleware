@@ -20,8 +20,6 @@ class StepDef {
     }
 
     if (step.pattern === this.pattern) {
-      console.log(step)
-      console.log(this)
       let datalen = step.data.length;
       if (step.table) {
         datalen += 1;
