@@ -5,12 +5,12 @@ This is a middleware server for testing owncloud (owncloud10 or OCIS) with diffe
 ### How it works
 Since most tests in owncloud are written in gherkin, the middleware server accepts a gherkin step, parses it and runs the appropriate code to get the server to a certain state.
 
-For example, If we want to run a gherkin step `Given user "Alice" has been created with default attributes`, the wen send this step to the middleware server which runs it and creates the user on the oc server with all necessary default attributes (displayname, email etc.) and also stores the user so that we can cleanup after the test is complete.
+For example, If we want to run a gherkin step `Given user "Alice" has been created with default attributes`, the test runner sends this step to the middleware server which runs it and creates the user on the oc server with all necessary default attributes (displayname, email etc.) and also stores the user so that we can cleanup after the test is complete.
 
 ### Endpoints
 - POST /init
     
-    reset the server step and start a test scenario execution
+    reset the middleware state and start a test scenario execution
     ```
     curl -XPOST http://localhost:3000/init
     ```
@@ -22,7 +22,7 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
     curl -XPOST http://localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes"}' -H "Content-Type: application/json"
     ```
 
-    Ghrkin data tables are passed as simple 2D array in json
+    Gherkin data tables are passed as a simple 2D array in json
     ```
     curl -XPOST http://localhost:3000/execute -d '{"step":"Given these groups have been created:","table":[["groupname"],["HelloGroup"]]}' -H 'Content-Type: application/json'
     ```
@@ -35,7 +35,7 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
     ```
 
 ### Integration with test frameworks
-The middleware service is designed to used with the gherkin test runner such as cucumber and behat. In order to integrate this service with the test suite, we need to find a way to capture the steps that need to be run in the middleware. Most test runners allow use of regex in the matching of the step definition. We can use any regex rule to match all the steps that need to run in the middleware. you can capture them at once and send them to the middleware service.
+The middleware service is designed to be used with gherkin test runners such as cucumber and behat. In order to integrate this service with the test suite, we need to find a way to capture the steps that need to be run in the middleware. Most test runners allow use of regex in the matching of the step definition. We can use any regex rule to match all the steps that need to run in the middleware. you can capture them at once and send them to the middleware service.
 for example, for all the steps you want to run in the middleware start them with `in the server`, then you can use regex `/^in the server (.*)$/` to capture all the steps
 
 eg. Cucumber Integration
