@@ -21,7 +21,7 @@ class StepDef {
 
     if (step.pattern === this.pattern) {
       let datalen = step.data.length;
-      if (step.table && step.table.length) {
+      if (step.table) {
         datalen += 1;
       }
 
@@ -139,4 +139,69 @@ function verifyMatchParams(pattern) {
   return { pattern, data };
 }
 
-module.exports = { Token, Step, StepDef, TestContext };
+class Table {
+  constructor(data) {
+    this.data = data;
+
+    if (!this.valid()) {
+      throw new Error("Invalid table provided, please recheck");
+    }
+  }
+
+  valid() {
+    if (!Array.isArray(this.data)) {
+      return false;
+    }
+
+    let len;
+    for (const item of this.data) {
+      if (!Array.isArray(item)) {
+        return false;
+      }
+      if (len) {
+        if (item.length !== len) {
+          return false;
+        }
+      }
+      len = item.length;
+    }
+    return true;
+  }
+
+  rowsHash() {
+    if (this.data[0].length > 2) {
+      throw new Error(
+        "Cannot perform rowsHash on table with more than 2 columns"
+      );
+    }
+
+    const result = {};
+    for (let i = 0; i < this.data.length; i++) {
+      result[this.data[i][0]] = this.data[i][1];
+    }
+    return result;
+  }
+
+  rows() {
+    return this.data;
+  }
+
+  raw() {
+    return this.data;
+  }
+
+  hashes() {
+    const header = this.data[0];
+    const result = [];
+    for (let i = 1; i < this.data.length; i++) {
+      const hash = {};
+      for (let j = 0; j < this.data[i].length; j++) {
+        hash[header[j]] = this.data[i][j];
+      }
+      result.push(hash);
+    }
+    return result;
+  }
+}
+
+module.exports = { Token, Step, StepDef, TestContext, Table };

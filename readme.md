@@ -22,6 +22,11 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
     curl -XPOST http://localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes"}' -H "Content-Type: application/json"
     ```
 
+    Ghrkin data tables are passed as simple 2D array in json
+    ```
+    curl -XPOST http://localhost:3000/execute -d '{"step":"Given these groups have been created:","table":[["groupname"],["HelloGroup"]]}' -H 'Content-Type: application/json'
+    ```
+
 - POST /cleanup
 
     cleanup the middleware state and the owncloud server

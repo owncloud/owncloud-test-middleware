@@ -94,7 +94,6 @@ const requestEndpoint = function (path, params, userId = "admin", header = {}) {
     "remote.php/dav",
     path
   );
-  console.log(url, options);
   return fetcher(url, options);
 };
 
@@ -121,7 +120,6 @@ const requestOCSEndpoint = function (
     "ocs/v2.php",
     path + separator + "format=json"
   );
-  console.log(url, options);
   return fetcher(url, options);
 };
 

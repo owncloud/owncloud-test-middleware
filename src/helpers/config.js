@@ -20,8 +20,6 @@ async function setSkeletonDirectory(server, admin) {
 }
 
 function rollbackSystemConfigs(oldSysConfig, newSysConfig) {
-  console.log(oldSysConfig);
-  console.log(newSysConfig);
   const configToChange = difference(newSysConfig, oldSysConfig);
   const _rollbacks = [];
 
@@ -82,7 +80,6 @@ async function getConfigs() {
 
 async function cacheConfigs(server) {
   config[server] = await getConfigs();
-  console.log(config);
   return config;
 }
 
