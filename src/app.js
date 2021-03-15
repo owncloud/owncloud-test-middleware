@@ -64,7 +64,7 @@ app.use("/execute", async (req, res) => {
       .status(404)
       .send(
         `Could not find the matching step definition for "${pattern}"${
-          table.length ? " with datatable" : ""
+          table && table.length ? " with datatable" : ""
         }`
       )
       .end();
