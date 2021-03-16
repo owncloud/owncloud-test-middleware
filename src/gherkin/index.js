@@ -117,7 +117,7 @@ class Step {
 }
 
 function verifyMatchParams(pattern) {
-  var reg = RegExp(/(\d+|"([^\"]*)")/g); // eslint-disable-line no-useless-escape
+  var reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g); // eslint-disable-line no-useless-escape
   var data = [];
   let found = pattern.match(reg);
 
@@ -126,14 +126,15 @@ function verifyMatchParams(pattern) {
   }
 
   for (const match of found) {
-    if (match[0] === '"') {
-      data.push(match.replace(/['"]+/g, "")); // eslint-disable-line no-useless-escape
+    if (match[0] === '"' || match[0] === "'") {
+      data.push(match.substring(1, match.length - 1));
     } else {
       data.push(match);
     }
   }
 
   pattern = pattern.replace(/\"[^\"]*\"/g, "{string}"); // eslint-disable-line no-useless-escape
+  pattern = pattern.replace(/\'[^\']*\'/g, "{string}"); // eslint-disable-line no-useless-escape
   pattern = pattern.replace(/\d+/g, "{int}"); // eslint-disable-line no-useless-escape
 
   return { pattern, data };
