@@ -46,12 +46,12 @@ app.use("/execute", async (req, res) => {
   const reqStep = new Step(token, pattern, table);
   const stepDef = testContext.getMatch(reqStep);
 
-  console.log("Executing new step:\n", reqStep)
+  console.log("Executing new step:\n", reqStep);
   if (stepDef) {
     try {
-      const args = [...reqStep.data]
+      const args = [...reqStep.data];
       if (table) {
-        args.push(table)
+        args.push(table);
       }
       await stepDef.run(...args);
       return res.writeHead(200).end();
