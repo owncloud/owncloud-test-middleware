@@ -9,9 +9,41 @@ class StepDef {
     if (typeof action !== "function") {
       throw new Error("not function type");
     }
+    if (!Object.values(Token).includes(token)) {
+      throw new Error("Invalid token type");
+    }
     this.token = token;
     this.pattern = pattern;
     this.action = action;
+  }
+
+  getPatterns() {
+    const reg = RegExp(/([^\s]+\/\w*)/g); // eslint-disable-line no-useless-escape
+    let steps = [];
+    const found = this.pattern.match(reg);
+
+    if (!found) {
+      return [this.pattern];
+    }
+    for (const match of found) {
+      const parts = match.split("/");
+      if (steps.length) {
+        let newSteps = [];
+        for (const step of steps) {
+          const temp = [];
+          for (const part of parts) {
+            temp.push(step.replace(match, part));
+          }
+          newSteps = [...newSteps, ...temp];
+        }
+        steps = newSteps;
+      } else {
+        for (const part of parts) {
+          steps.push(this.pattern.replace(match, part));
+        }
+      }
+    }
+    return steps;
   }
 
   match(step) {
@@ -19,7 +51,7 @@ class StepDef {
       return false;
     }
 
-    if (step.pattern === this.pattern) {
+    if (this.getPatterns().includes(step.pattern)) {
       let datalen = step.data.length;
       if (step.table) {
         datalen += 1;
