@@ -7,6 +7,7 @@ const httpHelper = require("../helpers/httpHelper");
 const backendHelper = require("../helpers/backendHelper");
 const userSettings = require("../helpers/userSettings");
 const sharingHelper = require("../helpers/sharingHelper");
+const testHelper = require("../helpers/testHelper");
 const { SHARE_TYPES } = require("../helpers/sharingHelper");
 const { runOcc } = require("../helpers/occHelper");
 const _ = require("lodash");
@@ -146,7 +147,7 @@ When(
 const waitBetweenShareOperations = async function () {
   const timeSinceLastShare = Date.now() - timeOfLastShareOperation;
   if (timeSinceLastShare <= 1001) {
-    await client.pause(1001 - timeSinceLastShare);
+    await testHelper.customDelay(1001 - timeSinceLastShare);
   }
 };
 
