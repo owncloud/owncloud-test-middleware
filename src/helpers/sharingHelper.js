@@ -485,12 +485,4 @@ module.exports = {
       throw new Error("Invalid Share Type" + lastShare);
     }
   },
-  /**
-   * custom sleep
-   */
-  customDelay: function (time) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, time);
-    });
-  },
 };
