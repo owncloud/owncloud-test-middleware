@@ -146,7 +146,7 @@ When(
 const waitBetweenShareOperations = async function () {
   const timeSinceLastShare = Date.now() - timeOfLastShareOperation;
   if (timeSinceLastShare <= 1001) {
-    await client.pause(1001 - timeSinceLastShare);
+    await sharingHelper.customDelay(1001 - timeSinceLastShare);
   }
 };
 

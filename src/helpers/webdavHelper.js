@@ -1,10 +1,11 @@
-const { client } = require("../config.js");
 const httpHelper = require("../helpers/httpHelper");
 const backendHelper = require("./backendHelper");
 const convert = require("xml-js");
 const _ = require("lodash/object");
 const { normalize, join, filename } = require("../helpers/path");
 const occHelper = require("../helpers/occHelper");
+const sharingHelper = require("../helpers/sharingHelper");
+
 
 const uploadTimeStamps = {};
 const deleteTimestamps = {};
@@ -49,7 +50,7 @@ exports.delete = async function (userId, file) {
   if (deleteTimestamps[userId] && deleteTimestamps[userId][filename]) {
     const timeSinceLastDelete = Date.now() - deleteTimestamps[userId][filename];
     if (timeSinceLastDelete < 1001) {
-      await client.pause(1001 - timeSinceLastDelete);
+      await sharingHelper.customDelay(1001 - timeSinceLastDelete);
     }
   }
 
@@ -203,7 +204,7 @@ exports.createFile = async function (user, fileName, contents = "") {
     const timeSinceLastFileUpload =
       Date.now() - uploadTimeStamps[user][fileName];
     if (timeSinceLastFileUpload <= 1001) {
-      await client.pause(1001 - timeSinceLastFileUpload);
+      await sharingHelper.customDelay(1001 - timeSinceLastFileUpload);
     }
   }
 
