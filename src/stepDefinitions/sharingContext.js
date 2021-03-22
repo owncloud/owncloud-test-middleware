@@ -1679,3 +1679,14 @@ Given(
     ]);
   }
 );
+
+Given(
+  "user {string} has updated the share permissions for file/folder {string} to {string}",
+  function (sharer, resource, permissions) {
+    return sharingHelper.updateSharedFilePermissionByUser(
+      sharer,
+      resource,
+      permissions
+    );
+  }
+);

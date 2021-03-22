@@ -485,4 +485,32 @@ module.exports = {
       throw new Error("Invalid Share Type" + lastShare);
     }
   },
+  /**
+   * updates the shared file/folder permission by sharer
+   *
+   * @param shauser
+   * @param resource
+   * @param permissionsreTypeString
+   */
+  updateSharedFilePermissionByUser: async function (
+    sharer,
+    resource,
+    permissions
+  ) {
+    let shareID;
+    const shares = await this.getAllSharesSharedByUser(sharer);
+    for (const shareElement of shares) {
+      if (shareElement.uid_owner === sharer && shareElement.path === resource) {
+        shareID = shareElement.id.toString();
+        break;
+      }
+    }
+    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
+    const body = new URLSearchParams();
+    body.append("permissions", permissions);
+    return httpHelper.putOCS(apiURL, sharer, body.toString()).then((res) => {
+      httpHelper.checkStatus(res, "Could not update share.");
+      return res;
+    });
+  },
 };
