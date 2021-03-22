@@ -505,11 +505,20 @@ module.exports = {
         break;
       }
     }
+    if (!shareID) {
+      return Promise.reject(new Error("Could not find share"));
+    }
     const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
     const body = new URLSearchParams();
-    body.append("permissions", permissions);
+    const updatedPermissions = this.humanReadablePermissionsToBitmask(
+      permissions
+    );
+    body.append("permissions", updatedPermissions);
     return httpHelper.putOCS(apiURL, sharer, body.toString()).then((res) => {
-      httpHelper.checkStatus(res, "Could not update share.");
+      httpHelper.checkStatus(
+        res,
+        `Could not find ${resource} in shares, shared by ${sharer}`
+      );
       return res;
     });
   },
