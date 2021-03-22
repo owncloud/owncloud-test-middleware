@@ -507,7 +507,10 @@ module.exports = {
     }
     const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
     const body = new URLSearchParams();
-    body.append("permissions", permissions);
+    const updatedPermissions = this.humanReadablePermissionsToBitmask(
+      permissions
+    );
+    body.append("permissions", `${updatedPermissions}`);
     return httpHelper.putOCS(apiURL, sharer, body.toString()).then((res) => {
       httpHelper.checkStatus(res, "Could not update share.");
       return res;
