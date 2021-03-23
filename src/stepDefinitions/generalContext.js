@@ -6,6 +6,7 @@ const backendHelper = require("../helpers/backendHelper");
 const assert = require("assert");
 const fs = require("fs");
 const occHelper = require("../helpers/occHelper");
+const codify = require("../helpers/codify");
 
 const getConfigJsonContent = function (fullPathOfConfigFile) {
   if (!fs.existsSync(fullPathOfConfigFile)) {
@@ -257,13 +258,15 @@ const setTrustedServer = function (url) {
   });
 };
 
-Given("server {code} has been added as trusted server", function (server) {
+Given("server {string} has been added as trusted server", function (server) {
+  server = codify.replaceInlineCode(server);
   return setTrustedServer(server);
 });
 
 Given(
-  "server {code} has been added as trusted server on remote server",
+  "server {string} has been added as trusted server on remote server",
   function (url) {
+    url = codify.replaceInlineCode(url);
     return backendHelper.runOnRemoteBackend(setTrustedServer, url);
   }
 );

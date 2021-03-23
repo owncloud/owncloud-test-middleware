@@ -12,6 +12,7 @@ const { SHARE_TYPES } = require("../helpers/sharingHelper");
 const { runOcc } = require("../helpers/occHelper");
 const _ = require("lodash");
 const path = require("../helpers/path");
+const codify = require("../helpers/codify");
 const util = require("util");
 const {
   COLLABORATOR_PERMISSION_ARRAY,
@@ -1449,8 +1450,9 @@ Given(
 );
 
 Given(
-  "user {string} has accepted the share {string} offered by user {code}",
+  "user {string} has accepted the share {string} offered by user {string}",
   function (user, filename, sharer) {
+    sharer = codify.replaceInlineCode(sharer);
     return sharingHelper.acceptShare(filename, user, sharer);
   }
 );
@@ -1681,12 +1683,13 @@ Given(
 );
 
 Given(
-  "user {string} has updated the share permissions for file/folder {string} to {string}",
-  function (sharer, resource, permissions) {
+  "user {string} has updated the share permissions for file/folder {string} to {string} for user {string}",
+  function (sharer, resource, permissions, receiver) {
     return sharingHelper.updateSharedFilePermissionByUser(
       sharer,
       resource,
-      permissions
+      permissions,
+      receiver
     );
   }
 );

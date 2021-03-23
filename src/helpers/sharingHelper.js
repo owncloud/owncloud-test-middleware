@@ -491,16 +491,22 @@ module.exports = {
    * @param shauser
    * @param resource
    * @param permissionsreTypeString
+   * @param receiver
    */
   updateSharedFilePermissionByUser: async function (
     sharer,
     resource,
-    permissions
+    permissions,
+    receiver
   ) {
     let shareID;
     const shares = await this.getAllSharesSharedByUser(sharer);
     for (const shareElement of shares) {
-      if (shareElement.uid_owner === sharer && shareElement.path === resource) {
+      if (
+        shareElement.uid_owner === sharer &&
+        shareElement.path === resource &&
+        shareElement.share_with === receiver
+      ) {
         shareID = shareElement.id.toString();
         break;
       }
@@ -514,7 +520,7 @@ module.exports = {
       permissions
     );
     body.append("permissions", updatedPermissions);
-    return httpHelper.putOCS(apiURL, sharer, body.toString()).then((res) => {
+    return httpHelper.putOCS(apiURL, sharer, body).then((res) => {
       httpHelper.checkStatus(
         res,
         `Could not find ${resource} in shares, shared by ${sharer}`
