@@ -102,6 +102,27 @@ const requestEndpoint = function (path, params, userId = "admin", header = {}) {
  * @param {string} path
  * @param {object} params
  * @param {string} userId
+ * @param {string} pass
+ * @param {object} headers
+ *
+ * @returns {node-fetch}
+ */
+const request = function (path, params, userId, pass, headers = {}) {
+  headers = {
+    ...headers,
+    Authorization:
+      "Basic " + Buffer.from(userId + ":" + pass).toString("base64"),
+  };
+  const options = { ...params, headers };
+  const url = join(backendHelper.getCurrentBackendUrl(), path);
+  return fetcher(url, options);
+};
+
+/**
+ *
+ * @param {string} path
+ * @param {object} params
+ * @param {string} userId
  * @param {object} header
  *
  * @returns {node-fetch}
@@ -124,6 +145,7 @@ const requestOCSEndpoint = function (
 };
 
 module.exports = {
+  request,
   createAuthHeader,
   createOCSRequestHeaders,
   checkStatus,
