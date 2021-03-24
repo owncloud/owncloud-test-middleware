@@ -86,6 +86,10 @@ class TestContext {
       throw new Error("not function type");
     }
 
+    if (!Object.values(Token).includes(token)) {
+      throw new Error("Invalid token type");
+    }
+
     for (const step of this.steps) {
       if (step.pattern === pattern) {
         throw new Error("step already registered");
