@@ -1,0 +1,35 @@
+---
+kind: pipeline
+type: docker
+name: lint
+
+trigger:
+  event:
+    include:
+      - pull_request
+      - tag
+
+steps:
+  - name: lint test
+    image: node:latest
+    commands:
+      - yarn install
+      - yarn lint
+
+---
+kind: pipeline
+type: docker
+name: tests
+
+trigger:
+  event:
+    include:
+      - pull_request
+      - tag
+
+steps:
+  - name: unit test
+    image: node:latest
+    commands:
+      - yarn install
+      - yarn test
