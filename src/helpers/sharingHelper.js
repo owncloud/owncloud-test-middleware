@@ -3,6 +3,7 @@ const { normalize } = require("./path");
 const codify = require("../helpers/codify");
 const assert = require("assert");
 const { client } = require("../config.js");
+const path = require("../helpers/path");
 
 module.exports = {
   SHARE_TYPES: Object.freeze({
@@ -527,5 +528,54 @@ module.exports = {
       );
       return res;
     });
+  },
+  /**
+   * Download file/folder from the last public link created by the given link creator
+   *
+   * @async
+   * @param {string} linkCreator link creator
+   * @param {string} resource file/folder shared using the public link share
+   * @param {string} password public link password
+   * @returns {Promise<node-fetch.Response>}
+   */
+  downloadLastPublicLinkResource: async function (
+    linkCreator,
+    resource,
+    password = ""
+  ) {
+    let lastSTime = 0;
+    let share = false;
+    resource = path.resolve(resource);
+    const publicLinkShares = await this.getAllPublicLinkShares(linkCreator);
+
+    for (const s of publicLinkShares) {
+      if (lastSTime < s.stime) {
+        share = s;
+        lastSTime = share.stime;
+      }
+    }
+    if (!share) {
+      assert.fail(
+        "Expected public link for " +
+          resource +
+          " shared by " +
+          linkCreator +
+          " could not be found\n"
+      );
+    }
+
+    const apiURL = path.join(
+      "remote.php/dav/public-files",
+      share.token,
+      resource
+    );
+    const response = await httpHelper.request(
+      apiURL,
+      { method: "GET" },
+      "public",
+      password
+    );
+    const responseBody = await response.text();
+    return httpHelper.checkStatus(response, "Could not download public share.");
   },
 };
