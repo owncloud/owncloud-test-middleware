@@ -1,244 +1,242 @@
 const Token = Object.freeze({
-  GIVEN: "GIVEN",
-  WHEN: "WHEN",
-  THEN: "THEN",
-});
+  GIVEN: 'GIVEN',
+  WHEN: 'WHEN',
+  THEN: 'THEN',
+})
 
 class StepDef {
   constructor(token, pattern, action) {
-    if (typeof action !== "function") {
-      throw new Error("not function type");
+    if (typeof action !== 'function') {
+      throw new Error('not function type')
     }
     if (!Object.values(Token).includes(token)) {
-      throw new Error("Invalid token type");
+      throw new Error('Invalid token type')
     }
-    this.token = token;
-    this.pattern = pattern;
-    this.action = action;
+    this.token = token
+    this.pattern = pattern
+    this.action = action
   }
 
   getPatterns() {
-    const reg = RegExp(/([^\s]+\/\w*)/g); // eslint-disable-line no-useless-escape
-    let steps = [];
-    const found = this.pattern.match(reg);
+    const reg = RegExp(/([^\s]+\/\w*)/g) // eslint-disable-line no-useless-escape
+    let steps = []
+    const found = this.pattern.match(reg)
 
     if (!found) {
-      return [this.pattern];
+      return [this.pattern]
     }
     for (const match of found) {
-      const parts = match.split("/");
+      const parts = match.split('/')
       if (steps.length) {
-        let newSteps = [];
+        let newSteps = []
         for (const step of steps) {
-          const temp = [];
+          const temp = []
           for (const part of parts) {
-            temp.push(step.replace(match, part));
+            temp.push(step.replace(match, part))
           }
-          newSteps = [...newSteps, ...temp];
+          newSteps = [...newSteps, ...temp]
         }
-        steps = newSteps;
+        steps = newSteps
       } else {
         for (const part of parts) {
-          steps.push(this.pattern.replace(match, part));
+          steps.push(this.pattern.replace(match, part))
         }
       }
     }
-    return steps;
+    return steps
   }
 
   match(step) {
     if (step.token !== this.token) {
-      return false;
+      return false
     }
 
     if (this.getPatterns().includes(step.pattern)) {
-      let datalen = step.data.length;
+      let datalen = step.data.length
       if (step.table) {
-        datalen += 1;
+        datalen += 1
       }
 
       if (datalen !== this.action.length) {
-        return false;
+        return false
       }
-      return true;
+      return true
     }
-    return false;
+    return false
   }
 
   run() {
     if (arguments.length !== this.action.length) {
-      throw new Error("Cannot run step with invalid num of args");
+      throw new Error('Cannot run step with invalid num of args')
     }
 
-    return this.action(...arguments);
+    return this.action(...arguments)
   }
 }
 
 class TestContext {
   constructor() {
-    this.steps = [];
-    this.afterSteps = [];
-    this.beforeSteps = [];
+    this.steps = []
+    this.afterSteps = []
+    this.beforeSteps = []
   }
 
   addstep(token, pattern, action) {
-    if (typeof action !== "function") {
-      throw new Error("not function type");
+    if (typeof action !== 'function') {
+      throw new Error('not function type')
     }
 
     if (!Object.values(Token).includes(token)) {
-      throw new Error("Invalid token type");
+      throw new Error('Invalid token type')
     }
 
     for (const step of this.steps) {
       if (step.pattern === pattern) {
-        throw new Error("step already registered");
+        throw new Error('step already registered')
       }
     }
 
-    this.steps.push(new StepDef(token, pattern, action));
+    this.steps.push(new StepDef(token, pattern, action))
   }
 
   given(pattern, action) {
-    this.addstep(Token.GIVEN, pattern, action);
+    this.addstep(Token.GIVEN, pattern, action)
   }
 
   when(pattern, action) {
-    this.addstep(Token.WHEN, pattern, action);
+    this.addstep(Token.WHEN, pattern, action)
   }
 
   then(pattern, action) {
-    this.addstep(Token.THEN, pattern, action);
+    this.addstep(Token.THEN, pattern, action)
   }
 
   after(fn) {
-    this.afterSteps.push(fn);
+    this.afterSteps.push(fn)
   }
 
   before(fn) {
-    this.beforeSteps.push(fn);
+    this.beforeSteps.push(fn)
   }
 
   getMatch(step) {
     for (const stepdef of this.steps) {
       if (stepdef.match(step)) {
-        return stepdef;
+        return stepdef
       }
     }
-    return null;
+    return null
   }
 
   async cleanup() {
     for (const fn of this.afterSteps) {
-      await fn();
+      await fn()
     }
   }
 
   async setup() {
     for (const fn of this.beforeSteps) {
-      await fn();
+      await fn()
     }
   }
 }
 
 class Step {
   constructor(token, stepPattern, table) {
-    this.token = token;
+    this.token = token
 
-    const { pattern, data } = verifyMatchParams(stepPattern);
-    this.pattern = pattern;
-    this.data = data;
-    this.table = table;
+    const { pattern, data } = verifyMatchParams(stepPattern)
+    this.pattern = pattern
+    this.data = data
+    this.table = table
   }
 }
 
 function verifyMatchParams(pattern) {
-  var reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g); // eslint-disable-line no-useless-escape
-  var data = [];
-  let found = pattern.match(reg);
+  var reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g) // eslint-disable-line no-useless-escape
+  var data = []
+  let found = pattern.match(reg)
 
   if (!found) {
-    found = [];
+    found = []
   }
 
   for (const match of found) {
     if (match[0] === '"' || match[0] === "'") {
-      data.push(match.substring(1, match.length - 1));
+      data.push(match.substring(1, match.length - 1))
     } else {
-      data.push(match);
+      data.push(match)
     }
   }
 
-  pattern = pattern.replace(/\"[^\"]*\"/g, "{string}"); // eslint-disable-line no-useless-escape
-  pattern = pattern.replace(/\'[^\']*\'/g, "{string}"); // eslint-disable-line no-useless-escape
-  pattern = pattern.replace(/\d+/g, "{int}"); // eslint-disable-line no-useless-escape
+  pattern = pattern.replace(/\"[^\"]*\"/g, '{string}') // eslint-disable-line no-useless-escape
+  pattern = pattern.replace(/\'[^\']*\'/g, '{string}') // eslint-disable-line no-useless-escape
+  pattern = pattern.replace(/\d+/g, '{int}') // eslint-disable-line no-useless-escape
 
-  return { pattern, data };
+  return { pattern, data }
 }
 
 class Table {
   constructor(data) {
-    this.data = data;
+    this.data = data
 
     if (!this.valid()) {
-      throw new Error("Invalid table provided, please recheck");
+      throw new Error('Invalid table provided, please recheck')
     }
   }
 
   valid() {
     if (!Array.isArray(this.data)) {
-      return false;
+      return false
     }
 
-    let len;
+    let len
     for (const item of this.data) {
       if (!Array.isArray(item)) {
-        return false;
+        return false
       }
       if (len) {
         if (item.length !== len) {
-          return false;
+          return false
         }
       }
-      len = item.length;
+      len = item.length
     }
-    return true;
+    return true
   }
 
   rowsHash() {
     if (this.data[0].length > 2) {
-      throw new Error(
-        "Cannot perform rowsHash on table with more than 2 columns"
-      );
+      throw new Error('Cannot perform rowsHash on table with more than 2 columns')
     }
 
-    const result = {};
+    const result = {}
     for (let i = 0; i < this.data.length; i++) {
-      result[this.data[i][0]] = this.data[i][1];
+      result[this.data[i][0]] = this.data[i][1]
     }
-    return result;
+    return result
   }
 
   rows() {
-    return this.data;
+    return this.data
   }
 
   raw() {
-    return this.data;
+    return this.data
   }
 
   hashes() {
-    const header = this.data[0];
-    const result = [];
+    const header = this.data[0]
+    const result = []
     for (let i = 1; i < this.data.length; i++) {
-      const hash = {};
+      const hash = {}
       for (let j = 0; j < this.data[i].length; j++) {
-        hash[header[j]] = this.data[i][j];
+        hash[header[j]] = this.data[i][j]
       }
-      result.push(hash);
+      result.push(hash)
     }
-    return result;
+    return result
   }
 }
 
-module.exports = { Token, Step, StepDef, TestContext, Table };
+module.exports = { Token, Step, StepDef, TestContext, Table }

@@ -1,9 +1,9 @@
-const httpHelper = require("./httpHelper");
-const { normalize } = require("./path");
-const codify = require("../helpers/codify");
-const assert = require("assert");
-const { client } = require("../config.js");
-const path = require("../helpers/path");
+const httpHelper = require('./httpHelper')
+const { normalize } = require('./path')
+const codify = require('../helpers/codify')
+const assert = require('assert')
+const { client } = require('../config.js')
+const path = require('../helpers/path')
 
 module.exports = {
   SHARE_TYPES: Object.freeze({
@@ -25,28 +25,26 @@ module.exports = {
     pending: 1,
     declined: 2,
   }),
-  COLLABORATOR_PERMISSION_ARRAY: ["share", "update", "create", "delete"],
+  COLLABORATOR_PERMISSION_ARRAY: ['share', 'update', 'create', 'delete'],
   /**
    *
    * @param permissionsString string of permissions separated by comma. For valid permissions see this.PERMISSION_TYPES
    * @returns {number} a number the OCS sharing API understands see https://doc.owncloud.com/server/developer_manual/core/apis/ocs-share-api.html
    */
   humanReadablePermissionsToBitmask: function (permissionsString) {
-    let permissionBitMask = 0;
-    let humanReadablePermissions = permissionsString.split(",");
+    let permissionBitMask = 0
+    let humanReadablePermissions = permissionsString.split(',')
     humanReadablePermissions = humanReadablePermissions.map(function (s) {
-      return String.prototype.trim.apply(s);
-    });
+      return String.prototype.trim.apply(s)
+    })
     for (var i = 0; i < humanReadablePermissions.length; i++) {
       if (humanReadablePermissions[i] in this.PERMISSION_TYPES) {
-        permissionBitMask =
-          permissionBitMask +
-          this.PERMISSION_TYPES[humanReadablePermissions[i]];
+        permissionBitMask = permissionBitMask + this.PERMISSION_TYPES[humanReadablePermissions[i]]
       } else {
-        throw Error("Invalid permission: " + humanReadablePermissions[i]);
+        throw Error('Invalid permission: ' + humanReadablePermissions[i])
       }
     }
-    return permissionBitMask;
+    return permissionBitMask
   },
   /**
    * converts the human readable share-type string to the API number as defined in https://doc.owncloud.com/server/10.0/developer_manual/core/ocs-share-api.html#create-a-new-share
@@ -54,11 +52,11 @@ module.exports = {
    * @returns {number}
    */
   humanReadableShareTypeToNumber: function (shareTypeString) {
-    shareTypeString = shareTypeString.trim();
+    shareTypeString = shareTypeString.trim()
     if (!(shareTypeString in this.SHARE_TYPES)) {
-      throw Error("Invalid share type: " + shareTypeString);
+      throw Error('Invalid share type: ' + shareTypeString)
     }
-    return this.SHARE_TYPES[shareTypeString];
+    return this.SHARE_TYPES[shareTypeString]
   },
   /**
    * if the given string starts with a `+` or `-` the function will calculate the date (from today) and return the string of the new date
@@ -66,34 +64,34 @@ module.exports = {
    * @returns {string}
    */
   calculateDate: function (dateString) {
-    if (dateString.startsWith("+") || dateString.startsWith("-")) {
-      dateString = parseInt(dateString);
-      const date = new Date();
-      date.setDate(date.getDate() + dateString);
+    if (dateString.startsWith('+') || dateString.startsWith('-')) {
+      dateString = parseInt(dateString)
+      const date = new Date()
+      date.setDate(date.getDate() + dateString)
       dateString =
         date.getFullYear() +
-        "-" +
-        String(date.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(date.getDate()).padStart(2, "0") +
-        " 00:00:00";
+        '-' +
+        String(date.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(date.getDate()).padStart(2, '0') +
+        ' 00:00:00'
     }
-    return dateString;
+    return dateString
   },
   assertUserHasNoShares: function (user) {
-    const apiURL = "apps/files_sharing/api/v1/shares?";
+    const apiURL = 'apps/files_sharing/api/v1/shares?'
     return httpHelper
       .getOCS(apiURL, user)
       .then((res) => res.json())
       .then(function (sharesResult) {
         httpHelper.checkOCSStatus(
           sharesResult,
-          "Could not get shares. Message: " + sharesResult.ocs.meta.message
-        );
-        const shares = sharesResult.ocs.data;
-        assert.equal(0, shares.length);
-        return this;
-      });
+          'Could not get shares. Message: ' + sharesResult.ocs.meta.message
+        )
+        const shares = sharesResult.ocs.data
+        assert.equal(0, shares.length)
+        return this
+      })
   },
   /**
    *
@@ -103,15 +101,11 @@ module.exports = {
    *
    * @returns {Promise<unknown>}
    */
-  assertUserHasShareWithDetails: function (
-    user,
-    expectedDetailsTable,
-    filters = {}
-  ) {
-    codify.replaceInlineTable(expectedDetailsTable);
-    const sharingHelper = this;
-    const apiURL = "apps/files_sharing/api/v1/shares?";
-    const search = new URLSearchParams(filters).toString();
+  assertUserHasShareWithDetails: function (user, expectedDetailsTable, filters = {}) {
+    codify.replaceInlineTable(expectedDetailsTable)
+    const sharingHelper = this
+    const apiURL = 'apps/files_sharing/api/v1/shares?'
+    const search = new URLSearchParams(filters).toString()
 
     return httpHelper
       .getOCS(apiURL + search, user)
@@ -119,48 +113,44 @@ module.exports = {
       .then(function (sharesResult) {
         httpHelper.checkOCSStatus(
           sharesResult,
-          "Could not get shares. Message: " + sharesResult.ocs.meta.message
-        );
-        const shares = sharesResult.ocs.data;
-        let found;
+          'Could not get shares. Message: ' + sharesResult.ocs.meta.message
+        )
+        const shares = sharesResult.ocs.data
+        let found
         for (const share of shares) {
-          found = true;
+          found = true
           for (const expectedDetail of expectedDetailsTable.hashes()) {
-            if (expectedDetail.field === "permissions") {
+            if (expectedDetail.field === 'permissions') {
               expectedDetail.value = sharingHelper
                 .humanReadablePermissionsToBitmask(expectedDetail.value)
-                .toString();
-            } else if (expectedDetail.field === "share_type") {
+                .toString()
+            } else if (expectedDetail.field === 'share_type') {
               expectedDetail.value = sharingHelper
                 .humanReadableShareTypeToNumber(expectedDetail.value)
-                .toString();
-            } else if (expectedDetail.field === "expiration") {
-              expectedDetail.value = sharingHelper.calculateDate(
-                expectedDetail.value
-              );
+                .toString()
+            } else if (expectedDetail.field === 'expiration') {
+              expectedDetail.value = sharingHelper.calculateDate(expectedDetail.value)
             }
 
             if (
               !(expectedDetail.field in share) ||
               share[expectedDetail.field].toString() !== expectedDetail.value
             ) {
-              found = false;
-              break;
+              found = false
+              break
             }
           }
           if (found) {
-            break;
+            break
           }
         }
         assert.strictEqual(
           found,
           true,
-          'could not find expected share in "' +
-            JSON.stringify(sharesResult, null, 2) +
-            '"'
-        );
-        return this;
-      });
+          'could not find expected share in "' + JSON.stringify(sharesResult, null, 2) + '"'
+        )
+        return this
+      })
   },
   /**
    * Asynchronously fetches the last public link created by the given link creator
@@ -170,38 +160,34 @@ module.exports = {
    * @return {Promise<Object>} last share token
    */
   fetchLastPublicLinkShare: async function (linkCreator) {
-    const self = this;
-    const apiURL = "apps/files_sharing/api/v1/shares";
-    let lastShareToken;
-    let lastShare;
+    const self = this
+    const apiURL = 'apps/files_sharing/api/v1/shares'
+    let lastShareToken
+    let lastShare
     await httpHelper
       .getOCS(apiURL, linkCreator)
       .then((res) => res.json())
       .then(function (sharesResult) {
         httpHelper.checkOCSStatus(
           sharesResult,
-          "Could not get shares. Message: " + sharesResult.ocs.meta.message
-        );
-        const shares = sharesResult.ocs.data;
-        let lastShareSTime = 0;
+          'Could not get shares. Message: ' + sharesResult.ocs.meta.message
+        )
+        const shares = sharesResult.ocs.data
+        let lastShareSTime = 0
         for (const share of shares) {
-          if (
-            share.share_type === self.SHARE_TYPES.public_link &&
-            share.stime > lastShareSTime
-          ) {
-            lastShareSTime = share.stime;
-            lastShareToken = share.token;
-            lastShare = share;
+          if (share.share_type === self.SHARE_TYPES.public_link && share.stime > lastShareSTime) {
+            lastShareSTime = share.stime
+            lastShareToken = share.token
+            lastShare = share
           }
         }
         if (lastShareToken === null) {
           throw Error(
-            "Could not find public shares. All shares: " +
-              JSON.stringify(shares, null, 2)
-          );
+            'Could not find public shares. All shares: ' + JSON.stringify(shares, null, 2)
+          )
         }
-      });
-    return lastShare;
+      })
+    return lastShare
   },
   /**
    * Asynchronously fetches the last public link created by the given link creator
@@ -213,21 +199,21 @@ module.exports = {
    * @return {Promise<Object>} last share token
    */
   updatePublicLinkPassword: function (linkCreator, shareID, password) {
-    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
-    const body = new URLSearchParams();
-    body.append("password", password);
+    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`
+    const body = new URLSearchParams()
+    body.append('password', password)
     return httpHelper
       .putOCS(apiURL, linkCreator, body)
       .then((res) => {
-        httpHelper.checkStatus(res, "Could not update share.");
-        return res.json();
+        httpHelper.checkStatus(res, 'Could not update share.')
+        return res.json()
       })
       .then((res) => {
         httpHelper.checkOCSStatus(
           res,
-          "Could not update share password. Message: " + res.ocs.meta.message
-        );
-      });
+          'Could not update share password. Message: ' + res.ocs.meta.message
+        )
+      })
   },
   /**
    * get a list of all public link shares shared by provided sharer
@@ -236,20 +222,20 @@ module.exports = {
    * @returns {Object<[]>}
    */
   getAllPublicLinkShares: async function (sharer) {
-    const data = [];
-    const apiURL = "apps/files_sharing/api/v1/shares";
-    const response = await httpHelper.getOCS(apiURL, sharer);
-    const jsonResponse = await response.json();
+    const data = []
+    const apiURL = 'apps/files_sharing/api/v1/shares'
+    const response = await httpHelper.getOCS(apiURL, sharer)
+    const jsonResponse = await response.json()
     httpHelper.checkOCSStatus(
       jsonResponse,
-      "Could not get shares. Message: " + jsonResponse.ocs.meta.message
-    );
+      'Could not get shares. Message: ' + jsonResponse.ocs.meta.message
+    )
     for (const share of jsonResponse.ocs.data) {
       if (share.share_type === this.SHARE_TYPES.public_link) {
-        data.push(share);
+        data.push(share)
       }
     }
-    return data;
+    return data
   },
   /**
    *
@@ -258,48 +244,42 @@ module.exports = {
    * @returns {Promise<[*]>}
    */
   getAllShares: function (user, sharedWithUser = false) {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams()
     if (sharedWithUser === true) {
-      params.set("shared_with_me", "true");
+      params.set('shared_with_me', 'true')
     }
-    params.set("format", "json");
-    params.set("state", "all");
-    const apiURL = `apps/files_sharing/api/v1/shares?${params.toString()}`;
+    params.set('format', 'json')
+    params.set('state', 'all')
+    const apiURL = `apps/files_sharing/api/v1/shares?${params.toString()}`
     return httpHelper
       .getOCS(apiURL, user)
       .then((res) => {
-        httpHelper.checkStatus(
-          res,
-          "The response status is not the expected value"
-        );
-        return res.json();
+        httpHelper.checkStatus(res, 'The response status is not the expected value')
+        return res.json()
       })
       .then((res) => {
-        return res.ocs.data;
-      });
+        return res.ocs.data
+      })
   },
   getAllSharesSharedWithUser: function (user) {
-    return this.getAllShares(user, true);
+    return this.getAllShares(user, true)
   },
   getAllSharesSharedByUser: function (user) {
-    return this.getAllShares(user);
+    return this.getAllShares(user)
   },
   getAllPendingFederatedShares: function (user) {
-    const params = new URLSearchParams();
-    params.set("format", "json");
-    const apiURL = `apps/files_sharing/api/v1/remote_shares/pending?${params.toString()}`;
+    const params = new URLSearchParams()
+    params.set('format', 'json')
+    const apiURL = `apps/files_sharing/api/v1/remote_shares/pending?${params.toString()}`
     return httpHelper
       .getOCS(apiURL, user)
       .then((res) => {
-        httpHelper.checkStatus(
-          res,
-          "The response status is not the expected value"
-        );
-        return res.json();
+        httpHelper.checkStatus(res, 'The response status is not the expected value')
+        return res.json()
       })
       .then((res) => {
-        return res.ocs.data;
-      });
+        return res.ocs.data
+      })
   },
 
   /**
@@ -311,35 +291,29 @@ module.exports = {
    * @param {string} sharer
    */
   declineShare: async function (filename, user, sharer) {
-    const allShares = await this.getAllSharesSharedWithUser(user);
+    const allShares = await this.getAllSharesSharedWithUser(user)
     const elementsToDecline = allShares.filter((element) => {
       return (
         element.state === this.SHARE_STATE.pending &&
         normalize(element.path) === filename &&
         element.uid_owner === sharer
-      );
-    });
+      )
+    })
     if (elementsToDecline.length < 1) {
-      throw new Error("Could not find the share to be declined");
+      throw new Error('Could not find the share to be declined')
     }
     for (const element of elementsToDecline) {
-      const shareID = element.id;
-      const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`;
+      const shareID = element.id
+      const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
       return httpHelper
         .deleteOCS(apiURL, user)
         .then((res) => {
-          res = httpHelper.checkStatus(
-            res,
-            "The response status is not the expected value"
-          );
-          return res.json();
+          res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+          return res.json()
         })
         .then((res) => {
-          httpHelper.checkOCSStatus(
-            res,
-            "Could not perform the decline action"
-          );
-        });
+          httpHelper.checkOCSStatus(res, 'Could not perform the decline action')
+        })
     }
   },
 
@@ -352,44 +326,41 @@ module.exports = {
    * @param {string} sharer
    */
   acceptShare: async function (filename, user, sharer) {
-    const allShares = await this.getAllSharesSharedWithUser(user);
+    const allShares = await this.getAllSharesSharedWithUser(user)
     const elementsToAccept = allShares.filter((element) => {
       return (
         element.state === this.SHARE_STATE.pending &&
         element.path.slice(1) === filename &&
         element.uid_owner === sharer
-      );
-    });
+      )
+    })
     if (elementsToAccept.length < 1) {
-      throw new Error("Could not find the share to be accepted");
+      throw new Error('Could not find the share to be accepted')
     }
     for (const element of elementsToAccept) {
-      const shareID = element.id;
-      const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`;
+      const shareID = element.id
+      const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
       return httpHelper
         .postOCS(apiURL, user)
         .then((res) => {
-          res = httpHelper.checkStatus(
-            res,
-            "The response status is not the expected value"
-          );
-          if (client.globals.ocis) return res.text();
-          return res.json();
+          res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+          if (client.globals.ocis) return res.text()
+          return res.json()
         })
         .then((res) => {
           if (client.globals.ocis) {
-            if (res !== "") {
+            if (res !== '') {
               throw new Error(`
               This is a good error, seems like a bug in ocis has been fixed,
               just fire up your text editor and remove this line,
               dont forget to keep your fingers crossed in the meantime.
               More on https://github.com/owncloud/product/issues/207
-            `);
+            `)
             }
-            return;
+            return
           }
-          httpHelper.checkOCSStatus(res, "Could not perform the accept action");
-        });
+          httpHelper.checkOCSStatus(res, 'Could not perform the accept action')
+        })
     }
   },
 
@@ -402,23 +373,17 @@ module.exports = {
    *
    */
   deleteShare: function (shareID, user) {
-    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
+    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`
     return httpHelper
       .deleteOCS(apiURL, user)
       .then((res) => {
-        res = httpHelper.checkStatus(
-          res,
-          "The response status is not the expected value"
-        );
-        console.log("deleted Share");
-        return res.json();
+        res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+        console.log('deleted Share')
+        return res.json()
       })
       .then((res) => {
-        return httpHelper.checkOCSStatus(
-          res,
-          `Could not delete the share with id ${shareID}`
-        );
-      });
+        return httpHelper.checkOCSStatus(res, `Could not delete the share with id ${shareID}`)
+      })
   },
   /**
    * Asynchronously accepts the shares in pending state and meeting the conditions
@@ -429,28 +394,22 @@ module.exports = {
    * @param {string} sharer
    */
   acceptLastPendingShare: async function (user) {
-    const allShares = await this.getAllPendingFederatedShares(user);
+    const allShares = await this.getAllPendingFederatedShares(user)
     if (!allShares.length) {
-      throw Error("No pending shares in server");
+      throw Error('No pending shares in server')
     }
-    const share = allShares[allShares.length - 1];
-    const shareID = share.id;
-    const apiURL = `apps/files_sharing/api/v1/remote_shares/pending/${shareID}`;
+    const share = allShares[allShares.length - 1]
+    const shareID = share.id
+    const apiURL = `apps/files_sharing/api/v1/remote_shares/pending/${shareID}`
     return httpHelper
       .postOCS(apiURL, user)
       .then((res) => {
-        return httpHelper.checkStatus(
-          res,
-          "The response status is not the expected value"
-        );
+        return httpHelper.checkStatus(res, 'The response status is not the expected value')
       })
       .then((res) => res.json())
       .then((res) => {
-        return httpHelper.checkOCSStatus(
-          res,
-          "Could not perform the accept action"
-        );
-      });
+        return httpHelper.checkOCSStatus(res, 'Could not perform the accept action')
+      })
   },
   /**
    * asserts expectedDetails with the last public link share of a user
@@ -461,29 +420,22 @@ module.exports = {
    * @param {string} expectedDetails.expireDate - expire date for public link share in format 'YYYY-MM-DD'
    * @returns {Promise<void>}
    */
-  assertUserLastPublicShareDetails: async function (
-    linkCreator,
-    expectedDetails
-  ) {
-    const lastShare = await this.fetchLastPublicLinkShare(linkCreator);
+  assertUserLastPublicShareDetails: async function (linkCreator, expectedDetails) {
+    const lastShare = await this.fetchLastPublicLinkShare(linkCreator)
     if (lastShare.share_type === this.SHARE_TYPES.public_link) {
-      const regDate = lastShare.expiration.split(" ")[0];
+      const regDate = lastShare.expiration.split(' ')[0]
       if (expectedDetails.token) {
-        assert.strictEqual(
-          lastShare.token,
-          expectedDetails.token,
-          "Token Mismatch" + lastShare
-        );
+        assert.strictEqual(lastShare.token, expectedDetails.token, 'Token Mismatch' + lastShare)
       }
       if (expectedDetails.expireDate) {
         assert.strictEqual(
           regDate,
           expectedDetails.expireDate,
-          "Expiry Date Mismatch: " + lastShare
-        );
+          'Expiry Date Mismatch: ' + lastShare
+        )
       }
     } else {
-      throw new Error("Invalid Share Type" + lastShare);
+      throw new Error('Invalid Share Type' + lastShare)
     }
   },
   /**
@@ -494,40 +446,30 @@ module.exports = {
    * @param permissionsreTypeString
    * @param receiver
    */
-  updateSharedFilePermissionByUser: async function (
-    sharer,
-    resource,
-    permissions,
-    receiver
-  ) {
-    let shareID;
-    const shares = await this.getAllSharesSharedByUser(sharer);
+  updateSharedFilePermissionByUser: async function (sharer, resource, permissions, receiver) {
+    let shareID
+    const shares = await this.getAllSharesSharedByUser(sharer)
     for (const shareElement of shares) {
       if (
         shareElement.uid_owner === sharer &&
         shareElement.path === resource &&
         shareElement.share_with === receiver
       ) {
-        shareID = shareElement.id.toString();
-        break;
+        shareID = shareElement.id.toString()
+        break
       }
     }
     if (!shareID) {
-      return Promise.reject(new Error("Could not find share"));
+      return Promise.reject(new Error('Could not find share'))
     }
-    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`;
-    const body = new URLSearchParams();
-    const updatedPermissions = this.humanReadablePermissionsToBitmask(
-      permissions
-    );
-    body.append("permissions", updatedPermissions);
+    const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`
+    const body = new URLSearchParams()
+    const updatedPermissions = this.humanReadablePermissionsToBitmask(permissions)
+    body.append('permissions', updatedPermissions)
     return httpHelper.putOCS(apiURL, sharer, body).then((res) => {
-      httpHelper.checkStatus(
-        res,
-        `Could not find ${resource} in shares, shared by ${sharer}`
-      );
-      return res;
-    });
+      httpHelper.checkStatus(res, `Could not find ${resource} in shares, shared by ${sharer}`)
+      return res
+    })
   },
   /**
    * Download file/folder from the last public link created by the given link creator
@@ -536,46 +478,34 @@ module.exports = {
    * @param {string} linkCreator link creator
    * @param {string} resource file/folder shared using the public link share
    * @param {string} password public link password
-   * @returns {Promise<node-fetch.Response>}
+   * @returns {Promise<string>}
    */
-  downloadLastPublicLinkResource: async function (
-    linkCreator,
-    resource,
-    password = ""
-  ) {
-    let lastSTime = 0;
-    let share = false;
-    resource = path.resolve(resource);
-    const publicLinkShares = await this.getAllPublicLinkShares(linkCreator);
+  downloadLastPublicLinkResource: async function (linkCreator, resource, password = '') {
+    let lastSTime = 0
+    let share = false
+    resource = path.resolve(resource)
+    const publicLinkShares = await this.getAllPublicLinkShares(linkCreator)
 
     for (const s of publicLinkShares) {
       if (lastSTime < s.stime) {
-        share = s;
-        lastSTime = share.stime;
+        share = s
+        lastSTime = share.stime
       }
     }
     if (!share) {
       assert.fail(
-        "Expected public link for " +
+        'Expected public link for ' +
           resource +
-          " shared by " +
+          ' shared by ' +
           linkCreator +
-          " could not be found\n"
-      );
+          ' could not be found\n'
+      )
     }
 
-    const apiURL = path.join(
-      "remote.php/dav/public-files",
-      share.token,
-      resource
-    );
-    const response = await httpHelper.request(
-      apiURL,
-      { method: "GET" },
-      "public",
-      password
-    );
-    const responseBody = await response.text();
-    return httpHelper.checkStatus(response, "Could not download public share.");
+    const apiURL = path.join('remote.php/dav/public-files', share.token, resource)
+    const response = await httpHelper.request(apiURL, { method: 'GET' }, 'public', password)
+    const responseBody = await response.text()
+    httpHelper.checkStatus(response, 'Could not download public share.')
+    return responseBody
   },
-};
+}

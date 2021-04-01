@@ -1,23 +1,23 @@
-const { client } = require("../config.js");
+const { client } = require('../config.js')
 
 /**
  * @enum {string}
  * @readonly
  */
 const BACKENDS = (exports.BACKENDS = Object.freeze({
-  local: "LOCAL",
-  remote: "REMOTE",
-}));
+  local: 'LOCAL',
+  remote: 'REMOTE',
+}))
 
 /**
  * Give the backend URL for currently default backend
  */
 exports.getCurrentBackendUrl = function () {
   // eslint-disable-next-line camelcase
-  const { backend_url, remote_backend_url, default_backend } = client.globals;
+  const { backend_url, remote_backend_url, default_backend } = client.globals
   // eslint-disable-next-line camelcase
-  return default_backend === BACKENDS.local ? backend_url : remote_backend_url;
-};
+  return default_backend === BACKENDS.local ? backend_url : remote_backend_url
+}
 
 /**
  * Run a function using the remote backend
@@ -34,22 +34,22 @@ exports.getCurrentBackendUrl = function () {
  * runOnRemoteBackend(() => doSomething(arg1, arg2)); // use closure to get better completion
  */
 exports.runOnRemoteBackend = async function (fn, ...args) {
-  if (typeof fn !== "function") {
-    throw new Error("expected function, received: " + typeof fn);
+  if (typeof fn !== 'function') {
+    throw new Error('expected function, received: ' + typeof fn)
   }
 
-  client.globals.default_backend = BACKENDS.remote;
-  let errorFound, res;
+  client.globals.default_backend = BACKENDS.remote
+  let errorFound, res
   try {
-    res = await fn(...args);
+    res = await fn(...args)
   } catch (e) {
-    errorFound = e;
+    errorFound = e
   } finally {
-    client.globals.default_backend = BACKENDS.local;
+    client.globals.default_backend = BACKENDS.local
   }
 
   if (errorFound) {
-    throw errorFound;
+    throw errorFound
   }
-  return res;
-};
+  return res
+}

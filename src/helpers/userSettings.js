@@ -1,18 +1,18 @@
-const { client } = require("../config.js");
+const { client } = require('../config.js')
 
-const { BACKENDS } = require("./backendHelper");
+const { BACKENDS } = require('./backendHelper')
 
 const passwords = {
-  admin: process.env.ADMIN_PASSWORD || "admin",
-  regular: process.env.REGULAR_USER_PASSWORD || "123456",
-  alt1: process.env.ALT1_USER_PASSWORD || "1234",
-  alt2: process.env.ALT2_USER_PASSWORD || "AaBb2Cc3Dd4",
-  alt3: process.env.ALT3_USER_PASSWORD || "aVeryLongPassword42TheMeaningOfLife",
-  alt4: process.env.ALT4_USER_PASSWORD || "ThisIsThe4thAlternatePwd",
-  alt11: process.env.ALT11_USER_PASSWORD || "E-leven",
-};
+  admin: process.env.ADMIN_PASSWORD || 'admin',
+  regular: process.env.REGULAR_USER_PASSWORD || '123456',
+  alt1: process.env.ALT1_USER_PASSWORD || '1234',
+  alt2: process.env.ALT2_USER_PASSWORD || 'AaBb2Cc3Dd4',
+  alt3: process.env.ALT3_USER_PASSWORD || 'aVeryLongPassword42TheMeaningOfLife',
+  alt4: process.env.ALT4_USER_PASSWORD || 'ThisIsThe4thAlternatePwd',
+  alt11: process.env.ALT11_USER_PASSWORD || 'E-leven',
+}
 
-const adminUsername = process.env.ADMIN_USERNAME || "admin";
+const adminUsername = process.env.ADMIN_USERNAME || 'admin'
 module.exports = {
   passwords,
   // list of default users
@@ -22,70 +22,70 @@ module.exports = {
       password: passwords.admin,
     },
     regularuser: {
-      displayname: "Regular User",
+      displayname: 'Regular User',
       password: passwords.regular,
-      email: "regularuser@example.org",
+      email: 'regularuser@example.org',
     },
     user0: {
-      displayname: "Regular User",
+      displayname: 'Regular User',
       password: passwords.regular,
-      email: "user0@example.org",
+      email: 'user0@example.org',
     },
     Alice: {
-      displayname: "Alice Hansen",
+      displayname: 'Alice Hansen',
       password: passwords.alt1,
-      email: "alice@example.org",
+      email: 'alice@example.org',
     },
     Brian: {
-      displayname: "Brian Murphy",
+      displayname: 'Brian Murphy',
       password: passwords.alt2,
-      email: "brian@example.org",
+      email: 'brian@example.org',
     },
     Carol: {
-      displayname: "Carol King",
+      displayname: 'Carol King',
       password: passwords.alt3,
-      email: "carol@example.org",
+      email: 'carol@example.org',
     },
     David: {
-      displayname: "David Lopez",
+      displayname: 'David Lopez',
       password: passwords.alt4,
-      email: "david@example.org",
+      email: 'david@example.org',
     },
     user11: {
-      displayname: "User Eleven",
+      displayname: 'User Eleven',
       password: passwords.alt11,
-      email: "user11@example.org",
+      email: 'user11@example.org',
     },
     usergrp: {
-      displayname: "User Grp",
+      displayname: 'User Grp',
       password: passwords.regular,
-      email: "usergrp@example.org",
+      email: 'usergrp@example.org',
     },
     sharee1: {
-      displayname: "Sharee One",
+      displayname: 'Sharee One',
       password: passwords.regular,
-      email: "sharee1@example.org",
+      email: 'sharee1@example.org',
     },
     // These users are available by default only in ocis backend when not using ldap
     Einstein: {
-      displayname: "Albert Einstein",
-      password: "relativity",
-      email: "einstein@example.org",
+      displayname: 'Albert Einstein',
+      password: 'relativity',
+      email: 'einstein@example.org',
     },
     Richard: {
-      displayname: "Richard Feynman",
-      password: "superfluidity",
-      email: "richard@example.org",
+      displayname: 'Richard Feynman',
+      password: 'superfluidity',
+      email: 'richard@example.org',
     },
     Marie: {
-      displayname: "Marie Curie",
-      password: "radioactivity",
-      email: "marie@example.org",
+      displayname: 'Marie Curie',
+      password: 'radioactivity',
+      email: 'marie@example.org',
     },
     Moss: {
-      displayname: "Maurice Moss",
-      password: "vista",
-      email: "moss@example.org",
+      displayname: 'Maurice Moss',
+      password: 'vista',
+      email: 'moss@example.org',
     },
   },
   createdUsers: {},
@@ -99,24 +99,19 @@ module.exports = {
    * @param {string} displayname
    * @param {string} email
    */
-  addUserToCreatedUsersList: function (
-    userId,
-    password,
-    displayname = null,
-    email = null
-  ) {
+  addUserToCreatedUsersList: function (userId, password, displayname = null, email = null) {
     if (client.globals.default_backend === BACKENDS.remote) {
       this.createdRemoteUsers[userId] = {
         password,
         displayname,
         email,
-      };
+      }
     } else {
       this.createdUsers[userId] = {
         password: password,
         displayname: displayname,
         email: email,
-      };
+      }
     }
   },
   /**
@@ -124,21 +119,21 @@ module.exports = {
    * @param {string} userId
    */
   deleteUserFromCreatedUsersList: function (userId) {
-    delete this.createdUsers[userId];
+    delete this.createdUsers[userId]
   },
   /**
    *
    * @param {string} groupId
    */
   addGroupToCreatedGroupsList: function (groupId) {
-    this.createdGroups.push(groupId);
+    this.createdGroups.push(groupId)
   },
   /**
    *
    * @param {string} userId
    */
   deleteGroupFromCreatedGroupsList: function (groupId) {
-    this.createdGroups = this.createdGroups.filter((item) => item !== groupId);
+    this.createdGroups = this.createdGroups.filter((item) => item !== groupId)
   },
   /**
    * gets the password of a previously created user
@@ -150,12 +145,12 @@ module.exports = {
    */
   getPasswordForUser: function (userId) {
     if (userId in this.createdUsers) {
-      return this.createdUsers[userId].password;
+      return this.createdUsers[userId].password
     } else if (userId in this.defaultUsers) {
-      return this.defaultUsers[userId].password;
+      return this.defaultUsers[userId].password
     } else {
       // user was not created yet and is not in the default users list, let the userId be the password
-      return userId;
+      return userId
     }
   },
   /**
@@ -167,18 +162,18 @@ module.exports = {
    * @returns {string}
    */
   getDisplayNameForUser: function (userId) {
-    let user = {};
+    let user = {}
     if (userId in this.createdUsers) {
-      user = this.createdUsers[userId];
+      user = this.createdUsers[userId]
     } else if (userId in this.defaultUsers) {
-      user = this.defaultUsers[userId];
+      user = this.defaultUsers[userId]
     } else {
-      return userId;
+      return userId
     }
-    if ("displayname" in user && user.displayname !== null) {
-      return user.displayname;
+    if ('displayname' in user && user.displayname !== null) {
+      return user.displayname
     } else {
-      return userId;
+      return userId
     }
   },
 
@@ -190,7 +185,7 @@ module.exports = {
   getUsernameFromDisplayname: function (displayName) {
     for (const userid in this.createdUsers) {
       if (this.createdUsers[userid].displayname === displayName) {
-        return userid;
+        return userid
       }
     }
   },
@@ -203,9 +198,9 @@ module.exports = {
    */
   getDisplayNameOfDefaultUser: function (userId) {
     if (userId in this.defaultUsers) {
-      return this.defaultUsers[userId].displayname;
+      return this.defaultUsers[userId].displayname
     } else {
-      return null;
+      return null
     }
   },
   /**
@@ -217,18 +212,18 @@ module.exports = {
    * @returns {null|string}
    */
   getEmailAddressForUser: function (userId) {
-    let user = {};
+    let user = {}
     if (userId in this.createdUsers) {
-      user = this.createdUsers[userId];
+      user = this.createdUsers[userId]
     } else if (userId in this.defaultUsers) {
-      user = this.defaultUsers[userId];
+      user = this.defaultUsers[userId]
     } else {
-      return `${userId}@example.org`;
+      return `${userId}@example.org`
     }
-    if ("email" in user && user.email !== null) {
-      return user.email;
+    if ('email' in user && user.email !== null) {
+      return user.email
     } else {
-      return `${userId}@example.org`;
+      return `${userId}@example.org`
     }
   },
   /**
@@ -240,9 +235,9 @@ module.exports = {
    */
   getEmailAddressOfDefaultUser: function (userId) {
     if (userId in this.defaultUsers) {
-      return this.defaultUsers[userId].email;
+      return this.defaultUsers[userId].email
     } else {
-      return null;
+      return null
     }
   },
   /**
@@ -252,13 +247,11 @@ module.exports = {
   getCreatedUsers: function (server = BACKENDS.local) {
     switch (server) {
       case BACKENDS.local:
-        return this.createdUsers;
+        return this.createdUsers
       case BACKENDS.remote:
-        return this.createdRemoteUsers;
+        return this.createdRemoteUsers
       default:
-        throw new Error(
-          'Invalid value for server. want = "REMOTE"/"LOCAL", got = ' + server
-        );
+        throw new Error('Invalid value for server. want = "REMOTE"/"LOCAL", got = ' + server)
     }
   },
   /**
@@ -266,14 +259,14 @@ module.exports = {
    * @returns {Array}
    */
   getCreatedGroups: function () {
-    return this.createdGroups;
+    return this.createdGroups
   },
 
   resetCreatedUsers: function () {
-    this.createdUsers = {};
+    this.createdUsers = {}
   },
 
   resetCreatedGroups: function () {
-    this.createdGroups = [];
+    this.createdGroups = []
   },
-};
+}
