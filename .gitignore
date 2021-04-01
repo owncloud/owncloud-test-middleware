@@ -120,3 +120,6 @@ dist-tsc/
 
 # bundle
 build/
+
+# intellij
+.idea/

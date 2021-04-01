@@ -5,6 +5,6 @@
  */
 exports.customDelay = function customDelay(time) {
   return new Promise((resolve) => {
-    setTimeout(resolve, time);
-  });
-};
+    setTimeout(resolve, time)
+  })
+}

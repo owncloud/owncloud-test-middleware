@@ -1,7 +1,7 @@
-const _ = require("lodash");
-const { client } = require("../config.js");
+const _ = require('lodash')
+const { client } = require('../config.js')
 
-const { passwords } = require("./userSettings");
+const { passwords } = require('./userSettings')
 
 /**
  * Gets the password for the un-initialized users and replaces the password accordingly
@@ -14,18 +14,18 @@ exports.replaceInlineCode = function (input) {
     ...passwords,
     remote_backend_url: client.globals.remote_backend_url,
     backend_url: client.globals.backend_url,
-  };
+  }
 
-  const interpolate = /%([\s\S]+?)%/g;
-  const compiled = _.template(input, { interpolate });
-  return compiled(codes);
-};
+  const interpolate = /%([\s\S]+?)%/g
+  const compiled = _.template(input, { interpolate })
+  return compiled(codes)
+}
 
 exports.replaceInlineTable = function (dataTable) {
   dataTable.raw().forEach((row) => {
     row.forEach((cell, index, arr) => {
-      arr[index] = exports.replaceInlineCode(cell);
-    });
-  });
-  return dataTable;
-};
+      arr[index] = exports.replaceInlineCode(cell)
+    })
+  })
+  return dataTable
+}
