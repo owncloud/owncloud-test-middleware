@@ -68,7 +68,7 @@ function rollbackAppConfigs(oldAppConfig, newAppConfig) {
   return Promise.all(_rollbacks)
 }
 
-export async function getConfigs() {
+async function getConfigs() {
   const resp = await occHelper.runOcc(['config:list'])
   let stdOut = _.get(resp, 'ocs.data.stdOut')
   if (stdOut === undefined) {
@@ -78,16 +78,16 @@ export async function getConfigs() {
   return stdOut
 }
 
-export async function cacheConfigs(server) {
+async function cacheConfigs(server) {
   config[server] = await getConfigs()
   return config
 }
 
-export async function setConfigs(skeletonType) {
+async function setConfigs(skeletonType) {
   await setSkeletonDirectory(skeletonType)
 }
 
-export async function rollbackConfigs(server) {
+async function rollbackConfigs(server) {
   const newConfig = await getConfigs()
 
   const appConfig = _.get(newConfig, 'apps')
@@ -102,7 +102,7 @@ export async function rollbackConfigs(server) {
   ])
 }
 
-export function getActualSkeletonDir(skeletonType) {
+function getActualSkeletonDir(skeletonType) {
   let directoryName
 
   switch (skeletonType) {
@@ -117,4 +117,12 @@ export function getActualSkeletonDir(skeletonType) {
       break
   }
   return directoryName
+}
+
+module.exports = {
+  getConfigs,
+  cacheConfigs,
+  setConfigs,
+  rollbackConfigs,
+  getActualSkeletonDir,
 }
