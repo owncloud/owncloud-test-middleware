@@ -9,8 +9,19 @@ const limit = pLimit(10)
 
 const config = {}
 
-async function setSkeletonDirectory(server, admin) {
-  const data = JSON.stringify({ directory: 'webUISkeleton' })
+async function setSkeletonDirectory(skeletonType) {
+  const directoryName = getActualSkeletonDir(skeletonType)
+
+  if (!directoryName) {
+    try {
+      await occHelper.runOcc(['config:system:get', 'skeletondirectory'])
+    } catch (e) {
+      if (e.toString().includes('400 undefined')) return
+    }
+    return await occHelper.runOcc(['config:system:delete', 'skeletondirectory'])
+  }
+
+  const data = JSON.stringify({ directory: directoryName })
   const apiUrl = 'apps/testing/api/v1/testingskeletondirectory'
   const resp = await httpHelper.postOCS(apiUrl, 'admin', data, {
     'Content-Type': 'application/json',
@@ -57,7 +68,7 @@ function rollbackAppConfigs(oldAppConfig, newAppConfig) {
   return Promise.all(_rollbacks)
 }
 
-async function getConfigs() {
+export async function getConfigs() {
   const resp = await occHelper.runOcc(['config:list'])
   let stdOut = _.get(resp, 'ocs.data.stdOut')
   if (stdOut === undefined) {
@@ -67,16 +78,16 @@ async function getConfigs() {
   return stdOut
 }
 
-async function cacheConfigs(server) {
+export async function cacheConfigs(server) {
   config[server] = await getConfigs()
   return config
 }
 
-async function setConfigs(server, admin = 'admin') {
-  await setSkeletonDirectory(server, admin)
+export async function setConfigs(skeletonType) {
+  await setSkeletonDirectory(skeletonType)
 }
 
-async function rollbackConfigs(server) {
+export async function rollbackConfigs(server) {
   const newConfig = await getConfigs()
 
   const appConfig = _.get(newConfig, 'apps')
@@ -91,9 +102,19 @@ async function rollbackConfigs(server) {
   ])
 }
 
-module.exports = {
-  getConfigs,
-  cacheConfigs,
-  setConfigs,
-  rollbackConfigs,
+export function getActualSkeletonDir(skeletonType) {
+  let directoryName
+
+  switch (skeletonType) {
+    case 'large':
+      directoryName = 'webUISkeleton'
+      break
+    case 'small':
+      directoryName = 'apiSkeleton'
+      break
+    default:
+      directoryName = false
+      break
+  }
+  return directoryName
 }
