@@ -49,11 +49,7 @@ app.use('/execute', async (req, res) => {
   console.log('Executing new step:\n', reqStep)
   if (stepDef) {
     try {
-      const args = [...reqStep.data]
-      if (table) {
-        args.push(table)
-      }
-      await stepDef.run(...args)
+      await stepDef.run(reqStep)
       return res.writeHead(200).end()
     } catch (e) {
       console.log(e)

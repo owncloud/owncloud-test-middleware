@@ -140,5 +140,6 @@ describe('test Step class with and without data and table', () => {
     expect(step.pattern).toStrictEqual(Data.data.step)
     expect(step.data).toStrictEqual(Data.data.dataValue)
     expect(step.table).toStrictEqual(Data.data.dataTable)
+    expect(step.literal).toStrictEqual(Data.stepPattern)
   })
 })

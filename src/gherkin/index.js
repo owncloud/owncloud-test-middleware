@@ -4,6 +4,11 @@ const Token = Object.freeze({
   THEN: 'THEN',
 })
 
+const patternTypes = {
+  REGULAR: 'REGULAR',
+  REGEX: 'REGEX',
+}
+
 class StepDef {
   constructor(token, pattern, action) {
     if (typeof action !== 'function') {
@@ -12,12 +17,18 @@ class StepDef {
     if (!Object.values(Token).includes(token)) {
       throw new Error('Invalid token type')
     }
+    pattern = pattern.toString()
+    this.type =
+      pattern.startsWith('/^') && pattern.endsWith('$/') ? patternTypes.REGEX : patternTypes.REGULAR
     this.token = token
     this.pattern = pattern
     this.action = action
   }
 
   getPatterns() {
+    if (this.type === patternTypes.REGEX) {
+      return [this.pattern]
+    }
     const reg = RegExp(/([^\s]+\/\w*)/g) // eslint-disable-line no-useless-escape
     let steps = []
     const found = this.pattern.match(reg)
@@ -46,7 +57,35 @@ class StepDef {
     return steps
   }
 
+  getRegexMatches(step) {
+    const pattern = this.getPatterns()[0]
+    const reg = new RegExp(pattern.substring(1, pattern.length - 1))
+    const matches = step.literal.match(reg)
+    if (matches === null) {
+      return matches
+    }
+    return matches.splice(1, matches.length - 1)
+  }
+
+  matchRegexPattern(step) {
+    const matches = this.getRegexMatches(step)
+    if (matches === null) {
+      return false
+    }
+    let datalen = matches.length
+    if (step.table) {
+      datalen += 1
+    }
+    if (datalen !== this.action.length) {
+      return false
+    }
+    return true
+  }
+
   match(step) {
+    if (this.type === patternTypes.REGEX) {
+      return this.matchRegexPattern(step)
+    }
     if (step.token !== this.token) {
       return false
     }
@@ -65,12 +104,22 @@ class StepDef {
     return false
   }
 
-  run() {
-    if (arguments.length !== this.action.length) {
+  run(reqStep) {
+    let args
+    if (this.type === patternTypes.REGEX) {
+      args = this.getRegexMatches(reqStep)
+    } else {
+      args = reqStep.data || []
+    }
+    if (reqStep.table) {
+      args.push(reqStep.table)
+    }
+
+    if (args.length !== this.action.length) {
       throw new Error('Cannot run step with invalid num of args')
     }
 
-    return this.action(...arguments)
+    return this.action(...args)
   }
 }
 
@@ -149,6 +198,7 @@ class Step {
     this.pattern = pattern
     this.data = data
     this.table = table
+    this.literal = stepPattern
   }
 }
 

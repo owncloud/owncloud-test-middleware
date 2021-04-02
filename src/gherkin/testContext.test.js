@@ -89,7 +89,7 @@ describe('test testContext', () => {
   it.each(testContextData)('test add step for different action types', (Data) => {
     const testContext = new TestContext()
     if (Data.action === 'function') {
-      testContext.when(Data.pattern, () => {
+      testContext.when(Data.textContext.pattern, () => {
         return 0
       })
     } else {
