@@ -9,8 +9,19 @@ const limit = pLimit(10)
 
 const config = {}
 
-async function setSkeletonDirectory(server, admin) {
-  const data = JSON.stringify({ directory: 'webUISkeleton' })
+async function setSkeletonDirectory(skeletonType) {
+  const directoryName = getActualSkeletonDir(skeletonType)
+
+  if (!directoryName) {
+    try {
+      await occHelper.runOcc(['config:system:get', 'skeletondirectory'])
+    } catch (e) {
+      if (e.toString().includes('400 undefined')) return
+    }
+    return await occHelper.runOcc(['config:system:delete', 'skeletondirectory'])
+  }
+
+  const data = JSON.stringify({ directory: directoryName })
   const apiUrl = 'apps/testing/api/v1/testingskeletondirectory'
   const resp = await httpHelper.postOCS(apiUrl, 'admin', data, {
     'Content-Type': 'application/json',
@@ -72,8 +83,8 @@ async function cacheConfigs(server) {
   return config
 }
 
-async function setConfigs(server, admin = 'admin') {
-  await setSkeletonDirectory(server, admin)
+async function setConfigs(skeletonType) {
+  await setSkeletonDirectory(skeletonType)
 }
 
 async function rollbackConfigs(server) {
@@ -91,9 +102,27 @@ async function rollbackConfigs(server) {
   ])
 }
 
+function getActualSkeletonDir(skeletonType) {
+  let directoryName
+
+  switch (skeletonType) {
+    case 'large':
+      directoryName = 'webUISkeleton'
+      break
+    case 'small':
+      directoryName = 'apiSkeleton'
+      break
+    default:
+      directoryName = false
+      break
+  }
+  return directoryName
+}
+
 module.exports = {
   getConfigs,
   cacheConfigs,
   setConfigs,
   rollbackConfigs,
+  getActualSkeletonDir,
 }

@@ -1,6 +1,6 @@
 const { client } = require('./config.js')
 const { Before, After } = require('./context/index.js')
-const { rollbackConfigs, setConfigs, cacheConfigs } = require('./helpers/config.js')
+const { rollbackConfigs, cacheConfigs } = require('./helpers/config.js')
 
 const ldap = require('./helpers/ldapHelper.js')
 
@@ -23,7 +23,6 @@ async function cacheAndSetConfigs(server) {
     return
   }
   await cacheConfigs(server)
-  return setConfigs(server, client.globals.backend_admin_username)
 }
 
 Before(function cacheAndSetConfigsOnLocal() {
