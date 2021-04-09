@@ -19,7 +19,7 @@ class StepDef {
     }
     pattern = pattern.toString()
     this.type =
-      pattern.startsWith('/^') && pattern.endsWith('$/') ? patternTypes.REGEX : patternTypes.REGULAR
+      pattern.startsWith('/') && pattern.endsWith('/') ? patternTypes.REGEX : patternTypes.REGULAR
     this.token = token
     this.pattern = pattern
     this.action = action
