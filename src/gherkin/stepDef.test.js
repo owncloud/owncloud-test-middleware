@@ -111,6 +111,19 @@ const stepDefPatternData = [
     },
     true,
   ],
+  [
+    {
+      stepDef: {
+        token: 'GIVEN',
+        pattern:
+          '/^user "([^"]*)" has been created with default attributes and (without|large|small) skeleton files$/',
+      },
+      patterns: [
+        '/^user "([^"]*)" has been created with default attributes and (without|large|small) skeleton files$/',
+      ],
+    },
+    true,
+  ],
 ]
 
 describe('Checking stepDef generated patterns', () => {
@@ -213,6 +226,35 @@ const stepDefMatchData = [
     },
     true,
   ],
+  [
+    {
+      stepDef: {
+        token: 'GIVEN',
+        pattern: '/^user "([^"]*)" has shared file "([^"]*)" with user "(Alice|Brian)"$/',
+      },
+      patterns: [
+        'user "Alice" has shared file "testResource/testsub" with user "Brian"',
+        'user "Brian" has shared file "hello.txt" with user "Alice"',
+        'user "Alice" has shared file "testResource/testsub" with user "Brian"',
+        'user "David" has shared file "testResource/tests" with user "Alice"',
+      ],
+    },
+    true,
+  ],
+  [
+    {
+      stepDef: {
+        token: 'GIVEN',
+        pattern: '/^user "([^"]*)" has shared (file|folder|resource) with user "([^"]*)"$/',
+      },
+      patterns: [
+        'user "Alice" has shared file with user "Brian"',
+        'user "Brian" has shared folder with user "Alice"',
+        'user "Alice" has shared resource with user "Brian"',
+      ],
+    },
+    true,
+  ],
 ]
 
 describe('Checking stepDef.match matches patterns', () => {
@@ -284,6 +326,48 @@ describe('Checking stepDef.match matches patterns', () => {
   })
 })
 
+const getRegexMatchData = [
+  [
+    {
+      regex: '/^user "([^"]*)" has been created$/',
+      step: 'user "Alice" has been created',
+      matches: ['Alice'],
+    },
+  ],
+  [
+    {
+      regex: '/^user "([^"]*)" has been created using (small|large|without) skeleton files$/',
+      step: 'user "Alice" has been created using small skeleton files',
+      matches: ['Alice', 'small'],
+    },
+  ],
+  [
+    {
+      regex: '/^user "([^"]*)" has been created using (small|large|without) skeleton files$/',
+      step: 'user "Alice" has been created using large skeleton files',
+      matches: ['Alice', 'large'],
+    },
+  ],
+  [
+    {
+      regex: '/^user "([^"]*)" has been created with (\\d+) skeleton files$/',
+      step: 'user "Alice" has been created with 5 skeleton files',
+      matches: ['Alice', '5'],
+    },
+  ],
+]
+
+describe('Checking stepDef.getRegexMatches', () => {
+  it.each(getRegexMatchData)('getRegexMatches should return correct data', (data) => {
+    const stepDef = new StepDef('GIVEN', data.regex, (arg) => {
+      return 0
+    })
+    const step = new Step('GIVEN', data.step)
+    matches = stepDef.getRegexMatches(step)
+    expect(matches).toStrictEqual(data.matches)
+  })
+})
+
 describe('Checking stepDef.run runs the function', () => {
   it('Step def match matches valid patterns', () => {
     let called = false
@@ -304,7 +388,7 @@ describe('Checking stepDef.run runs the function', () => {
     const res = stepDef.match(step)
     expect(res).toBe(true)
 
-    stepDef.run(...step.data)
+    stepDef.run(step)
 
     expect(called).toBe(true)
     expect(argUser).toBe('Alice')
