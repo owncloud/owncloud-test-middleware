@@ -83,3 +83,10 @@ Then(
     return sharingHelper.downloadLastPublicLinkResource(linkCreator, resource, password)
   }
 )
+
+Then(
+  'the public should not be able to download the file/folder {string} from the last created public link by {string}',
+  function (resource, linkCreator) {
+    return sharingHelper.downloadLastPublicLinkResource(linkCreator, resource)
+  }
+)

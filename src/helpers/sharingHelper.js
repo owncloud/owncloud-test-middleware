@@ -505,7 +505,11 @@ module.exports = {
     const apiURL = path.join('remote.php/dav/public-files', share.token, resource)
     const response = await httpHelper.request(apiURL, { method: 'GET' }, 'public', password)
     const responseBody = await response.text()
-    httpHelper.checkStatus(response, 'Could not download public share.')
-    return responseBody
+    if (response.status === 404) {
+      return response
+    } else {
+      httpHelper.checkStatus(response, 'Could not download public share.')
+      return responseBody
+    }
   },
 }
