@@ -14,6 +14,8 @@ require('./stepDefinitions/publicLinkContext.js')
 require('./stepDefinitions/sharingContext.js')
 require('./stepDefinitions/webdavContext.js')
 const { runOcc } = require('./helpers/occHelper')
+const { getCreatedGroups } = require('./helpers/userSettings')
+const { getCreatedUsers } = require('./helpers/userSettings')
 
 // Create Express Server
 const app = express()
@@ -113,6 +115,22 @@ app.use('/cleanup', async (req, res) => {
     await testContext.cleanup()
     res.writeHead(200)
     initialized = false
+  } catch (e) {
+    res.status(400).send(e.stack)
+  }
+  res.end()
+})
+
+app.use('/state', (req, res) => {
+  if (req.method !== 'GET') {
+    res.writeHead(405).end()
+  }
+  try {
+    res.status(200).json({
+      created_users: getCreatedUsers(),
+      created_remote_users: getCreatedUsers('REMOTE'),
+      created_groups: getCreatedGroups(),
+    })
   } catch (e) {
     res.status(400).send(e.stack)
   }
