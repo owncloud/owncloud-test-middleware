@@ -12,11 +12,7 @@ const passwords = {
   alt11: process.env.ALT11_USER_PASSWORD || 'E-leven',
 }
 
-let createdUsers = {}
-let createdGroups = []
-const createdRemoteUsers = {}
 const adminUsername = process.env.ADMIN_USERNAME || 'admin'
-
 module.exports = {
   passwords,
   // list of default users
@@ -92,23 +88,26 @@ module.exports = {
       email: 'moss@example.org',
     },
   },
+  createdUsers: {},
+  createdRemoteUsers: {},
+  createdGroups: [],
 
   /**
    *
    * @param {string} userId
    * @param {string} password
-   * @param {string|null} displayname
-   * @param {string|null} email
+   * @param {string} displayname
+   * @param {string} email
    */
   addUserToCreatedUsersList: function (userId, password, displayname = null, email = null) {
     if (client.globals.default_backend === BACKENDS.remote) {
-      createdRemoteUsers[userId] = {
+      this.createdRemoteUsers[userId] = {
         password,
         displayname,
         email,
       }
     } else {
-      createdUsers[userId] = {
+      this.createdUsers[userId] = {
         password: password,
         displayname: displayname,
         email: email,
@@ -120,21 +119,21 @@ module.exports = {
    * @param {string} userId
    */
   deleteUserFromCreatedUsersList: function (userId) {
-    delete createdUsers[userId]
+    delete this.createdUsers[userId]
   },
   /**
    *
    * @param {string} groupId
    */
   addGroupToCreatedGroupsList: function (groupId) {
-    createdGroups.push(groupId)
+    this.createdGroups.push(groupId)
   },
   /**
    *
    * @param {string} userId
    */
   deleteGroupFromCreatedGroupsList: function (groupId) {
-    createdGroups = createdGroups.filter((item) => item !== groupId)
+    this.createdGroups = this.createdGroups.filter((item) => item !== groupId)
   },
   /**
    * gets the password of a previously created user
@@ -145,8 +144,8 @@ module.exports = {
    * @returns {string}
    */
   getPasswordForUser: function (userId) {
-    if (userId in createdUsers) {
-      return createdUsers[userId].password
+    if (userId in this.createdUsers) {
+      return this.createdUsers[userId].password
     } else if (userId in this.defaultUsers) {
       return this.defaultUsers[userId].password
     } else {
@@ -164,8 +163,8 @@ module.exports = {
    */
   getDisplayNameForUser: function (userId) {
     let user = {}
-    if (userId in createdUsers) {
-      user = createdUsers[userId]
+    if (userId in this.createdUsers) {
+      user = this.createdUsers[userId]
     } else if (userId in this.defaultUsers) {
       user = this.defaultUsers[userId]
     } else {
@@ -184,8 +183,8 @@ module.exports = {
    * @param {string} displayName
    */
   getUsernameFromDisplayname: function (displayName) {
-    for (const userid in createdUsers) {
-      if (createdUsers[userid].displayname === displayName) {
+    for (const userid in this.createdUsers) {
+      if (this.createdUsers[userid].displayname === displayName) {
         return userid
       }
     }
@@ -214,8 +213,8 @@ module.exports = {
    */
   getEmailAddressForUser: function (userId) {
     let user = {}
-    if (userId in createdUsers) {
-      user = createdUsers[userId]
+    if (userId in this.createdUsers) {
+      user = this.createdUsers[userId]
     } else if (userId in this.defaultUsers) {
       user = this.defaultUsers[userId]
     } else {
@@ -248,9 +247,9 @@ module.exports = {
   getCreatedUsers: function (server = BACKENDS.local) {
     switch (server) {
       case BACKENDS.local:
-        return createdUsers
+        return this.createdUsers
       case BACKENDS.remote:
-        return createdRemoteUsers
+        return this.createdRemoteUsers
       default:
         throw new Error('Invalid value for server. want = "REMOTE"/"LOCAL", got = ' + server)
     }
@@ -260,14 +259,14 @@ module.exports = {
    * @returns {Array}
    */
   getCreatedGroups: function () {
-    return createdGroups
+    return this.createdGroups
   },
 
   resetCreatedUsers: function () {
-    createdUsers = {}
+    this.createdUsers = {}
   },
 
   resetCreatedGroups: function () {
-    createdGroups = []
+    this.createdGroups = []
   },
 }

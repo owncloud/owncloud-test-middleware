@@ -14,8 +14,7 @@ require('./stepDefinitions/publicLinkContext.js')
 require('./stepDefinitions/sharingContext.js')
 require('./stepDefinitions/webdavContext.js')
 const { runOcc } = require('./helpers/occHelper')
-const { getCreatedGroups } = require('./helpers/userSettings')
-const { getCreatedUsers } = require('./helpers/userSettings')
+const userSettings = require('./helpers/userSettings')
 
 // Create Express Server
 const app = express()
@@ -127,9 +126,9 @@ app.use('/state', (req, res) => {
   }
   try {
     res.status(200).json({
-      created_users: getCreatedUsers(),
-      created_remote_users: getCreatedUsers('REMOTE'),
-      created_groups: getCreatedGroups(),
+      created_users: userSettings.getCreatedUsers(),
+      created_remote_users: userSettings.getCreatedUsers('REMOTE'),
+      created_groups: userSettings.getCreatedGroups(),
     })
   } catch (e) {
     res.status(400).send(e.stack)
