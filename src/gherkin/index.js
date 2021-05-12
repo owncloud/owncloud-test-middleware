@@ -268,7 +268,7 @@ class Table {
   }
 
   rows() {
-    return this.data
+    return this.data.slice(1)
   }
 
   raw() {

@@ -47,6 +47,7 @@ const tableData = [
       data: [['valid', 'table']],
       hashes: [],
       rowsHash: { valid: 'table' },
+      rows: [],
     },
     true,
   ],
@@ -58,6 +59,7 @@ const tableData = [
       ],
       hashes: [{ valid: 'multiple', table: 'rows' }],
       rowsHash: { valid: 'table', multiple: 'rows' },
+      rows: [['multiple', 'rows']],
     },
     true,
   ],
@@ -73,6 +75,10 @@ const tableData = [
         { valid: 'and', table: 'More' },
       ],
       rowsHash: { valid: 'table', multiple: 'rows', and: 'More' },
+      rows: [
+        ['multiple', 'rows'],
+        ['and', 'More'],
+      ],
     },
     true,
   ],
@@ -84,6 +90,7 @@ const tableData = [
       ],
       hashes: [{ valid: 2, 1: 'numbers' }],
       rowsHash: { valid: 1, 2: 'numbers' },
+      rows: [[2, 'numbers']],
     },
     true,
   ],
@@ -99,6 +106,10 @@ const tableData = [
         { valid: 'and', table: 'many', with: 'More' },
       ],
       rowsHash: false,
+      rows: [
+        ['multiple', 'rows', 'data'],
+        ['and', 'many', 'More'],
+      ],
     },
     true,
   ],
@@ -127,7 +138,7 @@ describe('Table.rows()', () => {
       return
     }
     const table = new Table(tableData.data)
-    expect(table.rows()).toStrictEqual(tableData.data)
+    expect(table.rows()).toStrictEqual(tableData.rows)
     expect(table.raw()).toStrictEqual(tableData.data)
   })
 })
