@@ -92,6 +92,9 @@ Given(/^in the server (.*)$/, handler);
 - Since most of the test runner state such as the list of users created by the test runner are stored in the middleware, there is no need to remember them in the test runner itself.
 
 ### Config
+#### Server requirements:
+- `testing` app should be enabled
+
 #### Server specific config variables
 
 | setting | meaning | default |

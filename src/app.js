@@ -13,6 +13,7 @@ require('./stepDefinitions/provisioningContext.js')
 require('./stepDefinitions/publicLinkContext.js')
 require('./stepDefinitions/sharingContext.js')
 require('./stepDefinitions/webdavContext.js')
+const { runOcc } = require('./helpers/occHelper')
 
 // Create Express Server
 const app = express()
@@ -23,10 +24,31 @@ app.use(bodyParser.json())
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || 'localhost'
 
+// run cache
+let initialized
+
+function checkIfInitialized(res) {
+  if (!initialized) return res.status(403).send('Error: middleware is not initialized yet.')
+}
+
+async function checkIfTestingAppIsInstalledOnTheServer(res) {
+  try {
+    await runOcc(['app:list', 'testing'])
+  } catch (e) {
+    if (
+      e.message &&
+      e.message === 'HTTP Request Failed: Failed while executing occ command, Status: 500 undefined'
+    ) {
+      return res.status(500).send('Error: Testing app is not enabled on the server.')
+    }
+  }
+}
+
 app.use('/execute', async (req, res) => {
   if (req.method !== 'POST') {
     res.writeHead(405).end()
   }
+  checkIfInitialized(res)
   let { step, table } = req.body
   if (!step) {
     return res.status(400).send('Step needs to be provided')
@@ -72,8 +94,10 @@ app.use('/init', async (req, res) => {
     res.writeHead(405).end()
   }
   try {
+    await checkIfTestingAppIsInstalledOnTheServer(res)
     await testContext.setup()
     res.writeHead(200)
+    initialized = true
   } catch (e) {
     res.status(400).send(e.stack)
   }
@@ -84,9 +108,11 @@ app.use('/cleanup', async (req, res) => {
   if (req.method !== 'POST') {
     res.writeHead(405).end()
   }
+  checkIfInitialized(res)
   try {
     await testContext.cleanup()
     res.writeHead(200)
+    initialized = false
   } catch (e) {
     res.status(400).send(e.stack)
   }
