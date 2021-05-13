@@ -1,4 +1,5 @@
 const httpHelper = require('../helpers/httpHelper')
+const { exec } = require('child_process')
 
 /**
  * Run occ command using the testing API
@@ -19,4 +20,18 @@ exports.runOcc = function (args) {
       httpHelper.checkOCSStatus(res, 'Failed while executing occ command')
       return res
     })
+}
+
+exports.runOccWithCli = function (args) {
+  const CORE_PATH = process.env.CORE_PATH
+
+  return new Promise((resolve, reject) => {
+    exec('php ' + CORE_PATH + '/occ ' + args.join(' '), (err, stdout, stderr) => {
+      if (err) {
+        console.log(err)
+      } else {
+        resolve(stdout || stderr)
+      }
+    })
+  })
 }

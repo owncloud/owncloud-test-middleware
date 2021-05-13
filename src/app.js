@@ -24,28 +24,19 @@ app.use(bodyParser.json())
 // run cache
 let initialized
 
-function checkIfInitialized(res) {
-  if (!initialized) return res.status(403).send('Error: middleware is not initialized yet.')
-}
-
-async function checkIfTestingAppIsInstalledOnTheServer(res) {
-  try {
-    await runOcc(['app:list', 'testing'])
-  } catch (e) {
-    if (
-      e.message &&
-      e.message === 'HTTP Request Failed: Failed while executing occ command, Status: 500 undefined'
-    ) {
-      return res.status(500).send('Error: Testing app is not enabled on the server.')
-    }
-  }
-}
-
 app.use('/execute', async (req, res) => {
   if (req.method !== 'POST') {
     res.writeHead(405).end()
   }
-  checkIfInitialized(res)
+  if (!initialized) {
+    return res
+      .status(403)
+      .json({
+        success: false,
+        message: 'middleware is not initialized yet',
+      })
+      .end()
+  }
   let { step, table } = req.body
   if (!step) {
     return res.status(400).send('Step needs to be provided')
@@ -69,7 +60,7 @@ app.use('/execute', async (req, res) => {
   if (stepDef) {
     try {
       await stepDef.run(reqStep)
-      return res.status(200).send({ success: true, step: reqStep }).end()
+      return res.status(200).json({ success: true, step: reqStep }).end()
     } catch (e) {
       console.log(e)
       return res.status(400).send(e.stack).end()
@@ -91,24 +82,42 @@ app.use('/init', async (req, res) => {
     res.writeHead(405).end()
   }
   try {
-    await checkIfTestingAppIsInstalledOnTheServer(res)
+    await runOcc(['app:list', 'testing'])
     await testContext.setup()
     initialized = true
-    res.status(200).json({
-      success: true,
-      message: 'test middleware initialized',
-    })
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: 'test middleware initialized',
+      })
+      .end()
   } catch (e) {
-    res.status(400).send(e.stack)
+    if (
+      e.message &&
+      e.message === 'HTTP Request Failed: Failed while executing occ command, Status: 500 undefined'
+    ) {
+      return res
+        .status(500)
+        .json({ success: false, message: 'testing app is not enabled on the server.' })
+    }
+    res.status(400).send(e.stack).end()
   }
-  res.end()
 })
 
 app.use('/cleanup', async (req, res) => {
   if (req.method !== 'POST') {
     res.writeHead(405).end()
   }
-  checkIfInitialized(res)
+  if (!initialized) {
+    return res
+      .status(403)
+      .json({
+        success: false,
+        message: 'middleware is not initialized yet',
+      })
+      .end()
+  }
   try {
     await testContext.cleanup()
     initialized = false
@@ -124,18 +133,29 @@ app.use('/cleanup', async (req, res) => {
 
 app.use('/state', (req, res) => {
   if (req.method !== 'GET') {
-    res.writeHead(405).end()
+    return res.writeHead(405).end()
+  }
+  if (!initialized) {
+    return res
+      .status(403)
+      .json({
+        success: false,
+        message: 'middleware is not initialized yet',
+      })
+      .end()
   }
   try {
-    res.status(200).json({
-      created_users: userSettings.getCreatedUsers(),
-      created_remote_users: userSettings.getCreatedUsers('REMOTE'),
-      created_groups: userSettings.getCreatedGroups(),
-    })
+    return res
+      .status(200)
+      .json({
+        created_users: userSettings.getCreatedUsers(),
+        created_remote_users: userSettings.getCreatedUsers('REMOTE'),
+        created_groups: userSettings.getCreatedGroups(),
+      })
+      .end()
   } catch (e) {
-    res.status(400).send(e.stack)
+    return res.status(400).send(e.stack).end()
   }
-  res.end()
 })
 
 module.exports = app
