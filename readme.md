@@ -27,6 +27,15 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
     curl -XPOST http://localhost:3000/execute -d '{"step":"Given these groups have been created:","table":[["groupname"],["HelloGroup"]]}' -H 'Content-Type: application/json'
     ```
 
+- GET /state
+
+    retrieve current state of the test runner.
+    information like created users/groups list are shared
+    ```shell script
+      curl http://localhost:3000/state
+    ```
+
+
 - POST /cleanup
 
     cleanup the middleware state and the owncloud server
@@ -62,6 +71,12 @@ function handler(statement) {
         },
     }).then(res => {
         if (res.ok) {
+            // somewhere in the middle of init and cleanup
+            if(currentStateIsToBeFetched) {
+              return fetch("http://localhost:3000/state").then(res => {
+                return res.json()
+              })
+            }
             return res.text()
         } else {
             throw new Error(res.text())
