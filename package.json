@@ -7,8 +7,8 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "node src/app.js",
-    "watch": "nodemon src/app.js",
+    "start": "node src/index.js",
+    "watch": "nodemon src/index.js",
     "lint": "eslint src --ext js --color",
     "lint-fix": "eslint src --ext js --color --fix",
     "test": "jest */**/*.test.js"
@@ -39,6 +39,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^26.6.3",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "supertest": "^6.1.3"
   }
 }
