@@ -21,10 +21,6 @@ const app = express()
 
 app.use(bodyParser.json())
 
-// Configuration
-const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || 'localhost'
-
 // run cache
 let initialized
 
@@ -73,7 +69,7 @@ app.use('/execute', async (req, res) => {
   if (stepDef) {
     try {
       await stepDef.run(reqStep)
-      return res.writeHead(200).end()
+      return res.status(200).send({ success: true, step: reqStep }).end()
     } catch (e) {
       console.log(e)
       return res.status(400).send(e.stack).end()
@@ -97,8 +93,11 @@ app.use('/init', async (req, res) => {
   try {
     await checkIfTestingAppIsInstalledOnTheServer(res)
     await testContext.setup()
-    res.writeHead(200)
     initialized = true
+    res.status(200).json({
+      success: true,
+      message: 'test middleware initialized',
+    })
   } catch (e) {
     res.status(400).send(e.stack)
   }
@@ -112,8 +111,11 @@ app.use('/cleanup', async (req, res) => {
   checkIfInitialized(res)
   try {
     await testContext.cleanup()
-    res.writeHead(200)
     initialized = false
+    res.status(200).json({
+      success: true,
+      message: 'middleware cleaned up.',
+    })
   } catch (e) {
     res.status(400).send(e.stack)
   }
@@ -136,6 +138,4 @@ app.use('/state', (req, res) => {
   res.end()
 })
 
-app.listen(PORT, HOST, () => {
-  console.log(`Starting Test Middleware At ${HOST}:${PORT}`)
-})
+module.exports = app
