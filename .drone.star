@@ -1,7 +1,7 @@
 config = {
 	'app': 'owncloud-test-middleware',
 
-	'lint': True,
+	'lintTests': True,
 
 	'unitTests': True,
 
@@ -193,6 +193,8 @@ def installCore(db):
 
 
 def lintTest():
+	if not config['lintTests']:
+		return []
 	return [{
 		'kind': 'pipeline',
 		'type': 'docker',
@@ -210,6 +212,8 @@ def lintTest():
 
 
 def unitTests():
+	if not config['unitTests']:
+		return []
 	return [{
 		'kind': 'pipeline',
 		'type': 'docker',
@@ -227,6 +231,9 @@ def unitTests():
 
 
 def integrationTests():
+	if not config['integrationTests']:
+		return []
+
 	db = config["integrationTests"]["database"]
 
 	steps = installDependencies()
@@ -241,8 +248,10 @@ def integrationTests():
 			"BACKEND_HOST": "http://owncloud"
 		},
 		"commands": [
+			"apt update",
+ 			"curl -sL https://deb.nodesource.com/setup_14.x | bash -",
+ 			"apt install -y nodejs",
 			'node -v',
-			'pwd',
 			"yarn integration-tests",
 		]
 	}]

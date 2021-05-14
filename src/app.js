@@ -100,6 +100,7 @@ app.use('/init', async (req, res) => {
       return res
         .status(500)
         .json({ success: false, message: 'testing app is not enabled on the server.' })
+        .end()
     }
     res.status(400).send(e.stack).end()
   }

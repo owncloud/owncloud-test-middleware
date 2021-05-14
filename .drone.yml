@@ -106,8 +106,10 @@ steps:
   pull: always
   image: owncloudci/php:7.4
   commands:
+  - apt update
+  - curl -sL https://deb.nodesource.com/setup_14.x | bash -
+  - apt install -y nodejs
   - node -v
-  - pwd
   - yarn integration-tests
   environment:
     BACKEND_HOST: http://owncloud
