@@ -46,7 +46,6 @@ def installDependencies():
 		"image": "node:latest",
 		"pull": "always",
 		"commands": [
-				'pwd',
 				'yarn install'
 		],
 	}]
@@ -58,8 +57,6 @@ def fixPermissions():
 		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"commands": [
-				"ls /var/www/owncloud/",
-				"ls /var/www/owncloud/server",
 				"cd /var/www/owncloud/server",
 				"chown www-data * -R",
 		],
@@ -237,16 +234,16 @@ def integrationTests():
 	steps += fixPermissions()
 	steps += [{
 		"name": "integration-tests",
-		"image": "node:latest",
+		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"environment": {
 			"CORE_PATH": "/var/www/owncloud/server",
 			"BACKEND_HOST": "http://owncloud"
 		},
 		"commands": [
+			'node -v',
 			'pwd',
-			'cd /var/www/owncloud/owncloud-test-middleware',
-			"jest tests",
+			"yarn integration-tests",
 		]
 	}]
 

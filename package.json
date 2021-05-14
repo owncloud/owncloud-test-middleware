@@ -11,7 +11,8 @@
     "watch": "nodemon src/index.js",
     "lint": "eslint src --ext js --color",
     "lint-fix": "eslint src --ext js --color --fix",
-    "test": "jest */**/*.test.js"
+    "test": "jest */**/*.test.js",
+    "integration-tests": "jest tests/"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

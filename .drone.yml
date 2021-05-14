@@ -12,7 +12,6 @@ steps:
   pull: always
   image: node:latest
   commands:
-  - pwd
   - yarn install
 
 - name: lint test
@@ -40,7 +39,6 @@ steps:
   pull: always
   image: node:latest
   commands:
-  - pwd
   - yarn install
 
 - name: unit-tests
@@ -72,7 +70,6 @@ steps:
   pull: always
   image: node:latest
   commands:
-  - pwd
   - yarn install
 
 - name: install-core
@@ -102,18 +99,16 @@ steps:
   pull: always
   image: owncloudci/php:7.4
   commands:
-  - ls /var/www/owncloud/
-  - ls /var/www/owncloud/server
   - cd /var/www/owncloud/server
   - chown www-data * -R
 
 - name: integration-tests
   pull: always
-  image: node:latest
+  image: owncloudci/php:7.4
   commands:
+  - node -v
   - pwd
-  - cd /var/www/owncloud/owncloud-test-middleware
-  - jest tests
+  - yarn integration-tests
   environment:
     BACKEND_HOST: http://owncloud
     CORE_PATH: /var/www/owncloud/server
