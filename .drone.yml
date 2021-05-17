@@ -95,19 +95,19 @@ steps:
   commands:
   - tail -f /var/www/owncloud/server/data/owncloud.log
 
+- name: setup-server
+  pull: always
+  image: owncloudci/php:7.4
+  commands:
+  - cd /var/www/owncloud/server
+  - php occ a:e testing
+
 - name: fix-permissions
   pull: always
   image: owncloudci/php:7.4
   commands:
   - cd /var/www/owncloud/server
   - chown www-data * -R
-
-- name: setup-server
-  pull: always
-  image: owncloudci/php:7.4
-  commands:
-  - cd /var/www/owncloud/server
-  - php occ a:l testing
 
 - name: integration-tests
   pull: always
