@@ -238,7 +238,7 @@ def integrationTests():
 
 	steps = installDependencies()
 	steps += installCore(db) + owncloudLog()
-	steps += fixPermissions()
+	steps += fixPermissions() + setupServer()
 	steps += [{
 		"name": "integration-tests",
 		"image": "owncloudci/php:7.4",
@@ -274,4 +274,16 @@ def integrationTests():
 				"temp": {},
 		}],
 		'trigger': trigger
+	}]
+
+
+def setupServer():
+	return [{
+		"name": "setup-server",
+		"image": "owncloudci/php:7.4",
+		"pull": "always",
+		"commands": [
+			"cd /var/www/owncloud/server",
+			"php occ a:l testing"
+		]
 	}]
