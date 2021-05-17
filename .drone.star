@@ -6,7 +6,19 @@ config = {
 	'unitTests': True,
 
 	'integrationTests': {
-		"database": "mysql:5.5"
+		"database": "mysql:5.5",
+		"suites": [
+			{
+				"name": "endpoint-tests",
+				"testingAppRequired": True,
+				"command": "yarn test:integration:endpoints"
+			},
+			{
+				"name": "testing-app-tests",
+				"testingAppRequired": False,
+				"command": "yarn test:integration:testing-app"
+			}
+		],
 	}
 }
 
@@ -22,20 +34,75 @@ def main(ctx):
 	return lintTest() + unitTests() + integrationTests()
 
 
+def integrationTests():
+	pipelines = []
+	if not config['integrationTests']:
+		return pipelines
+	for category, matrix in config["integrationTests"].items():
+		if category == "suites":
+			i = 1
+			for suite in matrix:
+				db = config["integrationTests"]["database"]
+
+				steps = installDependencies()
+				steps += installCore(db) + owncloudLog()
+				steps += setupServer(suite["name"], suite["testingAppRequired"])
+				steps += fixPermissions()
+				steps += [{
+					"name": suite["name"],
+					"image": "owncloudci/php:7.4",
+					"pull": "always",
+					"environment": {
+						"CORE_PATH": "/var/www/owncloud/server",
+						"BACKEND_HOST": "http://owncloud"
+					},
+					"commands": [
+						"apt update",
+						"curl -sL https://deb.nodesource.com/setup_14.x | bash -",
+						"apt install -y nodejs",
+						'node -v',
+						suite["command"],
+					]
+				}]
+
+				pipelines.append({
+					'kind': 'pipeline',
+					'type': 'docker',
+					'name': 'integration-tests-{}'.format(i),
+					"workspace": {
+						"base": "/var/www/owncloud",
+						"path": config["app"],
+					},
+					'steps': steps,
+					'services': mysqlDbService(db) + owncloudService(),
+					"volumes": [{
+						"name": "uploads",
+						"temp": {},
+						}, {
+						"name": "configs",
+						"temp": {},
+					}],
+					'trigger': trigger
+				})
+				i = i+1
+	return pipelines
+
+
+
 def owncloudService():
 	return [{
 		"name": "owncloud",
 		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"environment": {
-				"APACHE_WEBROOT": "/var/www/owncloud/server/",
+			"APACHE_WEBROOT": "/var/www/owncloud/server/",
 		},
 		"command": [
-				"/usr/local/bin/apachectl",
-				"-e",
-				"debug",
-				"-D",
-				"FOREGROUND",
+			"/usr/local/bin/apachectl",
+			"-e",
+			"debug",
+			"-D",
+			"FOREGROUND",
 		],
 	}]
 
@@ -46,7 +113,7 @@ def installDependencies():
 		"image": "node:latest",
 		"pull": "always",
 		"commands": [
-				'yarn install'
+			'yarn install'
 		],
 	}]
 
@@ -57,8 +124,8 @@ def fixPermissions():
 		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"commands": [
-				"cd /var/www/owncloud/server",
-				"chown www-data * -R",
+			"cd /var/www/owncloud/server",
+			"chown www-data * -R",
 		],
 	}]
 
@@ -70,7 +137,7 @@ def owncloudLog():
 		"pull": "always",
 		"detach": True,
 		"commands": [
-				"tail -f /var/www/owncloud/server/data/owncloud.log",
+			"tail -f /var/www/owncloud/server/data/owncloud.log",
 		],
 	}]
 
@@ -79,114 +146,41 @@ def getDbName(db):
 	return db.split(":")[0]
 
 
-def getDbUsername(db):
-	name = getDbName(db)
-
-	if name == "oracle":
-			return "system"
-
-	return "owncloud"
-
-
-def getDbPassword(db):
-	name = getDbName(db)
-
-	if name == "oracle":
-			return "oracle"
-
-	return "owncloud"
-
-
-def getDbRootPassword():
-	return "owncloud"
-
-
-def getDbDatabase(db):
-	name = getDbName(db)
-
-	if name == "oracle":
-			return "XE"
-
-	return "owncloud"
-
-
-def databaseService(db):
+def mysqlDbService(db):
 	dbName = getDbName(db)
-	if (dbName == "mariadb") or (dbName == "mysql"):
-			return [{
-					"name": dbName,
-					"image": db,
-					"pull": "always",
-					"environment": {
-							"MYSQL_USER": getDbUsername(db),
-							"MYSQL_PASSWORD": getDbPassword(db),
-							"MYSQL_DATABASE": getDbDatabase(db),
-							"MYSQL_ROOT_PASSWORD": getDbRootPassword(),
-					},
-			}]
-
-	if dbName == "postgres":
-			return [{
-					"name": dbName,
-					"image": db,
-					"pull": "always",
-					"environment": {
-							"POSTGRES_USER": getDbUsername(db),
-							"POSTGRES_PASSWORD": getDbPassword(db),
-							"POSTGRES_DB": getDbDatabase(db),
-					},
-			}]
-
-	if dbName == "oracle":
-			return [{
-					"name": dbName,
-					"image": "deepdiver/docker-oracle-xe-11g:latest",
-					"pull": "always",
-					"environment": {
-							"ORACLE_USER": getDbUsername(db),
-							"ORACLE_PASSWORD": getDbPassword(db),
-							"ORACLE_DB": getDbDatabase(db),
-							"ORACLE_DISABLE_ASYNCH_IO": "true",
-					},
-			}]
-
-	return []
+	return [{
+		"name": dbName,
+		"image": db,
+		"pull": "always",
+		"environment": {
+			"MYSQL_USER": "owncloud",
+			"MYSQL_PASSWORD": "owncloud",
+			"MYSQL_DATABASE": "owncloud",
+			"MYSQL_ROOT_PASSWORD": "owncloud",
+		},
+	}]
 
 def installCore(db):
 	host = getDbName(db)
 	dbType = host
-
-	username = getDbUsername(db)
-	password = getDbPassword(db)
-	database = getDbDatabase(db)
-
-	if host == "mariadb":
-			dbType = "mysql"
-
-	if host == "postgres":
-			dbType = "pgsql"
-
-	if host == "oracle":
-			dbType = "oci"
-
 
 	return [{
 		"name": "install-core",
 		"image": "owncloudci/core",
 		"pull": "always",
 		"settings": {
-				"core_path": "/var/www/owncloud/server",
-				"db_type": dbType,
-				"db_name": database,
-				"db_host": host,
-				"db_username": username,
-				"db_password": password,
+			"core_path": "/var/www/owncloud/server",
+			"db_type": dbType,
+			"db_name": "owncloud",
+			"db_host": host,
+			"db_username": "owncloud",
+			"db_password": "owncloud",
 		},
 		"commands": [
-				"ls",
-				". /var/www/owncloud/owncloud-test-middleware/.drone.env",
-				"export PLUGIN_GIT_REFERENCE=$CORE_COMMITID",
-				"bash /usr/sbin/plugin.sh",
+			"ls",
+			". /var/www/owncloud/owncloud-test-middleware/.drone.env",
+			"export PLUGIN_GIT_REFERENCE=$CORE_COMMITID",
+			"bash /usr/sbin/plugin.sh",
 		]
 	}]
 
@@ -223,68 +217,22 @@ def unitTests():
 			'image': 'node:latest',
 			'pull': 'always',
 			'commands': [
-				'yarn test'
+				'yarn test:unit'
 			],
 		}],
 		'trigger': trigger
 	}]
 
 
-def integrationTests():
-	if not config['integrationTests']:
-		return []
-
-	db = config["integrationTests"]["database"]
-
-	steps = installDependencies()
-	steps += installCore(db) + owncloudLog()
-	steps += setupServer()
-	steps += fixPermissions()
-	steps += [{
-		"name": "integration-tests",
-		"image": "owncloudci/php:7.4",
-		"pull": "always",
-		"environment": {
-			"CORE_PATH": "/var/www/owncloud/server",
-			"BACKEND_HOST": "http://owncloud"
-		},
-		"commands": [
-			"apt update",
- 			"curl -sL https://deb.nodesource.com/setup_14.x | bash -",
- 			"apt install -y nodejs",
-			'node -v',
-			"yarn integration-tests",
-		]
-	}]
-
-	return [{
-		'kind': 'pipeline',
-		'type': 'docker',
-		'name': 'integration-tests',
-		"workspace": {
-			"base": "/var/www/owncloud",
-			"path": config["app"],
-		},
-		'steps': steps,
-		'services': databaseService(db) + owncloudService(),
-		"volumes": [{
-				"name": "uploads",
-				"temp": {},
-			}, {
-				"name": "configs",
-				"temp": {},
-		}],
-		'trigger': trigger
-	}]
-
-
-def setupServer():
+def setupServer(testingServer, tesingAppRequired=True):
 	return [{
 		"name": "setup-server",
 		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"commands": [
 			"cd /var/www/owncloud/server",
-			"php occ a:e testing"
+			"php occ a:e testing" if tesingAppRequired else "php occ a:l testing",
+			"php occ config:system:set trusted_domains 1 --value=owncloud",
+			"php occ config:system:set trusted_domains 2 --value=" + testingServer,
 		]
 	}]

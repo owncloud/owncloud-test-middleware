@@ -45,7 +45,7 @@ steps:
   pull: always
   image: node:latest
   commands:
-  - yarn test
+  - yarn test:unit
 
 trigger:
   ref:
@@ -55,7 +55,7 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: integration-tests
+name: integration-tests-1
 
 platform:
   os: linux
@@ -101,6 +101,8 @@ steps:
   commands:
   - cd /var/www/owncloud/server
   - php occ a:e testing
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ config:system:set trusted_domains 2 --value=endpoint-tests
 
 - name: fix-permissions
   pull: always
@@ -109,7 +111,7 @@ steps:
   - cd /var/www/owncloud/server
   - chown www-data * -R
 
-- name: integration-tests
+- name: endpoint-tests
   pull: always
   image: owncloudci/php:7.4
   commands:
@@ -117,7 +119,112 @@ steps:
   - curl -sL https://deb.nodesource.com/setup_14.x | bash -
   - apt install -y nodejs
   - node -v
-  - yarn integration-tests
+  - yarn test:integration:endpoints
+  environment:
+    BACKEND_HOST: http://owncloud
+    CORE_PATH: /var/www/owncloud/server
+
+services:
+- name: mysql
+  pull: always
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: owncloud
+
+- name: owncloud
+  pull: always
+  image: owncloudci/php:7.4
+  command:
+  - /usr/local/bin/apachectl
+  - -e
+  - debug
+  - -D
+  - FOREGROUND
+  environment:
+    APACHE_WEBROOT: /var/www/owncloud/server/
+
+volumes:
+- name: uploads
+  temp: {}
+- name: configs
+  temp: {}
+
+trigger:
+  ref:
+  - refs/pull/**
+  - refs/tags/**
+
+---
+kind: pipeline
+type: docker
+name: integration-tests-2
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: owncloud-test-middleware
+
+steps:
+- name: yarn-install
+  pull: always
+  image: node:latest
+  commands:
+  - yarn install
+
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  commands:
+  - ls
+  - . /var/www/owncloud/owncloud-test-middleware/.drone.env
+  - export PLUGIN_GIT_REFERENCE=$CORE_COMMITID
+  - bash /usr/sbin/plugin.sh
+  settings:
+    core_path: /var/www/owncloud/server
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: owncloud
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/server/data/owncloud.log
+
+- name: setup-server
+  pull: always
+  image: owncloudci/php:7.4
+  commands:
+  - cd /var/www/owncloud/server
+  - php occ a:l testing
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ config:system:set trusted_domains 2 --value=testing-app-tests
+
+- name: fix-permissions
+  pull: always
+  image: owncloudci/php:7.4
+  commands:
+  - cd /var/www/owncloud/server
+  - chown www-data * -R
+
+- name: testing-app-tests
+  pull: always
+  image: owncloudci/php:7.4
+  commands:
+  - apt update
+  - curl -sL https://deb.nodesource.com/setup_14.x | bash -
+  - apt install -y nodejs
+  - node -v
+  - yarn test:integration:testing-app
   environment:
     BACKEND_HOST: http://owncloud
     CORE_PATH: /var/www/owncloud/server

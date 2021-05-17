@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../src/app')
+const app = require('../../src/app')
 const assert = require('assert')
 
 describe('middleware should be initialized to perform other actions', () => {
