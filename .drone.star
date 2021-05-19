@@ -224,14 +224,14 @@ def unitTests():
 	}]
 
 
-def setupServer(testingServer, tesingAppRequired=True):
+def setupServer(testingServer, testingAppRequired=True):
 	return [{
 		"name": "setup-server",
 		"image": "owncloudci/php:7.4",
 		"pull": "always",
 		"commands": [
 			"cd /var/www/owncloud/server",
-			"php occ a:e testing" if tesingAppRequired else "php occ a:l testing",
+			"php occ a:e testing" if testingAppRequired else "php occ a:l testing",
 			"php occ config:system:set trusted_domains 1 --value=owncloud",
 			"php occ config:system:set trusted_domains 2 --value=" + testingServer,
 		]
