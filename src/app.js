@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const { Step, Token, Table } = require('./gherkin/index.js')
 const { testContext } = require('./context/index.js')
 
+const { client } = require('./config.js')
+
 // Register new contexts here
 require('./setup.js')
 require('./stepDefinitions/filesContext.js')
@@ -82,7 +84,9 @@ app.use('/init', async (req, res) => {
     res.writeHead(405).end()
   }
   try {
-    await runOcc(['app:list', 'testing'])
+    if (!client.globals.ocis) {
+      await runOcc(['app:list', 'testing'])
+    }
     await testContext.setup()
     initialized = true
     res
