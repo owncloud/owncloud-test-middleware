@@ -2,7 +2,7 @@ const path = require('path')
 const withHttp = (url) => (/^https?:\/\//i.test(url) ? url : `http://${url}`)
 
 const RUN_WITH_LDAP = !!process.env.RUN_WITH_LDAP
-const RUN_ON_OCIS = !!process.env.RUN_ON_OCIS
+const RUN_ON_OCIS = process.env.RUN_ON_OCIS === 'true'
 const LOCAL_BACKEND_URL = withHttp(
   process.env.BACKEND_HOST || (RUN_ON_OCIS ? 'https://localhost:9200' : 'http://localhost:8080')
 )
@@ -12,14 +12,13 @@ const REMOTE_BACKEND_URL = process.env.REMOTE_BACKEND_HOST
 const BACKEND_ADMIN_USERNAME = process.env.BACKEND_USERNAME || 'admin'
 const BACKEND_ADMIN_PASSWORD = process.env.BACKEND_PASSWORD || 'admin'
 
-const REMOTE_UPLOAD_DIR =
-  process.env.REMOTE_UPLOAD_DIR || path.join(__dirname, '/tests/acceptance/filesForUpload/')
+const REMOTE_UPLOAD_DIR = process.env.REMOTE_UPLOAD_DIR || path.join(__dirname, '../filesForUpload')
 
 const OCIS_REVA_DATA_ROOT = process.env.OCIS_REVA_DATA_ROOT || '/var/tmp/ocis/storage/owncloud'
 const LDAP_SERVER_URL = process.env.LDAP_SERVER_URL || 'ldap://127.0.0.1'
 const LDAP_BASE_DN = process.env.LDAP_BASE_DN || 'cn=admin,dc=owncloud,dc=com'
 const LDAP_ADMIN_PASSWORD = process.env.LDAP_ADMIN_PASSWORD || 'admin'
-const TESTING_DATA_DIR = process.env.TESTING_DATA_DIR || './tests/testing-app/data/'
+const TESTING_DATA_DIR = process.env.TESTING_DATA_DIR || '../testing/data'
 
 const config = {
   globals: {
