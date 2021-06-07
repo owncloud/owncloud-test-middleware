@@ -1,9 +1,11 @@
 const app = require('./app.js')
 
-// Configuration
-const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || 'localhost'
+const { log } = require('./log.js')
 
-app.listen(PORT, HOST, () => {
-  console.log(`Starting Test Middleware At ${HOST}:${PORT}`)
+// Configuration
+const MIDDLEWARE_PORT = process.env.MIDDLEWARE_PORT || 3000
+const MIDDLEWARE_HOST = process.env.MIDDLEWARE_HOST || 'localhost'
+
+app.listen(MIDDLEWARE_PORT, MIDDLEWARE_HOST, () => {
+  log.info(`Starting Test Middleware At ${MIDDLEWARE_HOST}:${MIDDLEWARE_PORT}`)
 })
