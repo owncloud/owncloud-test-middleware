@@ -9,7 +9,7 @@ describe('init should not be accessible without testing app enabled on the serve
       .then((response) => {
         assert.deepStrictEqual(response.body, {
           success: false,
-          message: 'testing app is not enabled on the server.',
+          message: 'testing app is not enabled on the server',
         })
         done()
       })
