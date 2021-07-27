@@ -138,8 +138,9 @@ Given(/^in the server (.*)$/, handler);
 | `LDAP_BASE_DN` | base DN of the admin server | cn=admin,dc=owncloud,dc=com |
 
 ### Starting the server
-To start the middleware server use the following command
+To start the middleware server change into the checkout directory of owncloud-test-middleware and use the following commands
 ```
+yarn install  # install dependencies from package.json
 yarn start
 ```
 This command assumes that your backend server is running on `http://localhost:8080/` for oc10 (or `https://localhost:9200` when `RUN_WITH_OCIS` is set). If your backend is running on a different address use:
