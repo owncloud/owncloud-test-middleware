@@ -108,7 +108,7 @@ Given(/^in the server (.*)$/, handler);
 
 ### Config
 #### Server requirements:
-- `testing` app should be enabled
+- `testing` app should be enabled (see [testing/README.md](https://github.com/owncloud/testing/blob/master/README.md))
 
 #### Server specific config variables
 
