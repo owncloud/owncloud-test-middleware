@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-expressions */
 const assert = require('assert')
-const { Given, Then } = require('../context')
+const { Given, When, Then } = require('../context')
 const webdav = require('../helpers/webdavHelper')
+const backendHelper = require('../helpers/backendHelper')
 const { move } = require('../helpers/webdavHelper')
 const path = require('../helpers/path')
 const { download } = require('../helpers/webdavHelper')
@@ -13,6 +14,7 @@ Given(
   'user {string} has uploaded file with content {string} to {string}',
   async function (user, content, filename) {
     await webdav.createFile(user, filename, content)
+    return this
   }
 )
 
@@ -22,6 +24,17 @@ Given(
     const filePath = path.join(client.globals.filesForUpload, source)
     const content = fs.readFileSync(filePath)
     await webdav.createFile(user, filename, content)
+  }
+)
+
+Given(
+  'user {string} has uploaded file {string} to {string} on remote server',
+  function (user, source, filename) {
+    return backendHelper.runOnRemoteBackend(async function () {
+      const filePath = path.join(client.globals.filesForUpload, source)
+      const content = fs.readFileSync(filePath)
+      await webdav.createFile(user, filename, content)
+    })
   }
 )
 
@@ -39,6 +52,7 @@ Given(
     for (const entry of filesToDelete) {
       await webdav.delete(user, entry.name)
     }
+    return client
   }
 )
 
@@ -86,6 +100,18 @@ Given('user {string} has renamed file/folder {string} to {string}', webdav.move)
 
 Given('user {string} has created folder {string}', webdav.createFolder)
 
+Given('user {string} has created folder {string} on remote server', function (userId, folderName) {
+  return backendHelper.runOnRemoteBackend(async function () {
+    await webdav.createFolder(userId, folderName)
+  })
+})
+
+Given('user {string} has created file {string} on remote server', function (userId, fileName) {
+  return backendHelper.runOnRemoteBackend(async function () {
+    await webdav.createFile(userId, fileName, '')
+  })
+})
+
 Given('user {string} has created file {string}', function (userId, fileName) {
   return webdav.createFile(userId, fileName, '')
 })
@@ -103,3 +129,23 @@ Given('user {string} has created the following files', async function (userId, e
   }
   return client
 })
+
+When('user {string} has renamed the following file', function (user, table) {
+  const fromName = table
+    .hashes()
+    .map((data) => data['from-name-parts'])
+    .join('')
+  const toName = table
+    .hashes()
+    .map((data) => data['to-name-parts'])
+    .join('')
+  return webdav.move(user, fromName, toName)
+})
+
+Given(
+  'user {string} has locked file/folder {string} setting following properties',
+  function (userId, fileName, table) {
+    const properties = table.rowsHash()
+    return webdav.lockResource(userId, fileName, properties)
+  }
+)

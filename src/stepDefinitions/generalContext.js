@@ -6,11 +6,10 @@ const backendHelper = require('../helpers/backendHelper')
 const assert = require('assert')
 const fs = require('fs')
 const occHelper = require('../helpers/occHelper')
-const codify = require('../helpers/codify')
 
 const getConfigJsonContent = function (fullPathOfConfigFile) {
   if (!fs.existsSync(fullPathOfConfigFile)) {
-    throw Error('Could not find config file')
+    throw Error('Could not find configfile')
   }
   const rawdata = fs.readFileSync(fullPathOfConfigFile)
   return JSON.parse(rawdata)
@@ -122,63 +121,44 @@ Then('no message should be displayed on the webUI', function () {
 })
 
 Then(
-  'as {string} the content of {string} should be the same as the local {string}',
-  function (userId, remoteFile, localFile) {
+  'as {string} the content of {string} should be the same as the content of local file {string}',
+  async function (userId, remoteFile, localFile) {
     const fullPathOfLocalFile = client.globals.filesForUpload + localFile
-    return webdavHelper
-      .download(userId, remoteFile)
-      .then((body) => assertContentOfLocalFileIs(fullPathOfLocalFile, body))
+    const body = await webdavHelper.download(userId, remoteFile)
+
+    assertContentOfLocalFileIs(fullPathOfLocalFile, body)
+
+    return this
   }
 )
 
 Then(
-  'as {string} the content of {string} should not be the same as the local {string}',
-  function (userId, remoteFile, localFile) {
+  'as {string} the content of {string} should not be the same as the content of local file {string}',
+  async function (userId, remoteFile, localFile) {
     const fullPathOfLocalFile = client.globals.filesForUpload + localFile
-    return webdavHelper
-      .download(userId, remoteFile)
-      .then((body) => assertContentOfLocalFileIsNot(fullPathOfLocalFile, body))
+    const body = await webdavHelper.download(userId, remoteFile)
+
+    assertContentOfLocalFileIsNot(fullPathOfLocalFile, body)
   }
 )
 
-const assertContentOfLocalFileIs = function (fullPathOfLocalFile, expectedContent) {
-  const actualContent = fs.readFileSync(fullPathOfLocalFile, {
-    encoding: 'utf-8',
-  })
-  return client.assert.strictEqual(
+const assertContentOfLocalFileIs = function (fullPathOfLocalFile, actualContent) {
+  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
+  return assert.strictEqual(
     actualContent,
     expectedContent,
     'asserting content of local file "' + fullPathOfLocalFile + '"'
   )
 }
 
-const assertContentOfLocalFileIsNot = function (fullPathOfLocalFile, expectedContent) {
-  const actualContent = fs.readFileSync(fullPathOfLocalFile, {
-    encoding: 'utf-8',
-  })
-  return client.assert.notEqual(
+const assertContentOfLocalFileIsNot = function (fullPathOfLocalFile, actualContent) {
+  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
+  return assert.notStrictEqual(
     actualContent,
     expectedContent,
     'asserting content of local file "' + fullPathOfLocalFile + '"'
   )
 }
-
-const assertRemoteFileSameAsSkeletonFile = async function (userId, remoteFile, skeletonFile) {
-  const skeleton = await webdavHelper.getSkeletonFile(skeletonFile)
-  const remote = await webdavHelper.download(userId, remoteFile)
-  return client.assert.strictEqual(
-    skeleton,
-    remote,
-    `Failed asserting remote file ${remoteFile} is same as skeleton file ${skeletonFile} for user${userId}`
-  )
-}
-
-Then(
-  'as {string} the content of {string} should be the same as the original {string}',
-  function (user, remoteFile, skeletonFile) {
-    return assertRemoteFileSameAsSkeletonFile(user, remoteFile, skeletonFile)
-  }
-)
 
 Given(
   'the setting {string} of app {string} has been set to {string}',
@@ -228,21 +208,15 @@ const setTrustedServer = function (url) {
   })
 }
 
-Given('server {string} has been added as trusted server', function (server) {
-  server = codify.replaceInlineCode(server)
+Given('server {code} has been added as trusted server', function (server) {
   return setTrustedServer(server)
 })
 
-Given('server {string} has been added as trusted server on remote server', function (url) {
-  url = codify.replaceInlineCode(url)
+Given('server {code} has been added as trusted server on remote server', function (url) {
   return backendHelper.runOnRemoteBackend(setTrustedServer, url)
 })
 
-After(async function () {
-  if (client.globals.ocis) {
-    return
-  }
-
+After(async function (testCase) {
   // clear file locks
   const body = new URLSearchParams()
   body.append('global', 'true')

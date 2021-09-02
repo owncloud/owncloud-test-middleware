@@ -48,10 +48,46 @@ const fileShouldNotHaveContent = async function (userId, file, content) {
   )
 }
 
-const fileShouldExist = function (userId, element) {
-  return fileExists(userId, element).then(function (res) {
-    assert.strictEqual(res.status, 207, 'File should exist, but does not')
-  })
+const getResourceType = function (data) {
+  let resourceType
+
+  const result = xml2js(data, { compact: true })
+  const responses = _.get(result, 'd:multistatus.d:response')
+  if (responses instanceof Array) {
+    resourceType = _.get(responses[0], 'd:propstat.d:prop.d:resourcetype')
+  } else {
+    resourceType = _.get(responses, 'd:propstat.d:prop.d:resourcetype')
+  }
+
+  if (Object.keys(resourceType)[0] === 'd:collection') {
+    return 'folder'
+  } else {
+    return 'file'
+  }
+}
+
+const assertResourceType = function (data, resource, type = 'file') {
+  type = type.toLowerCase()
+
+  const foundType = getResourceType(data)
+
+  const exists = foundType === type
+  assert.strictEqual(
+    exists,
+    true,
+    `Expected "${resource}" to be a "${type}", but found "${foundType}"`
+  )
+}
+
+const fileOrFolderShouldExist = function (userId, element, type = 'file') {
+  return fileExists(userId, element)
+    .then(function (res) {
+      assert.strictEqual(res.status, 207, `Resource "${element}" should exist, but does not`)
+      return res.text()
+    })
+    .then(function (data) {
+      assertResourceType(data, element, type)
+    })
 }
 
 const fileShouldNotExist = function (userId, element) {
@@ -71,23 +107,29 @@ Then(
   }
 )
 
-Then('as {string} file/folder {string} should exist', function (userId, element) {
-  return fileShouldExist(userId, element)
-})
-
-Then('as {string} file/folder {string} should exist on remote server', function (userId, element) {
-  return backendHelper.runOnRemoteBackend(fileShouldExist, userId, element)
-})
+Then(
+  /^as "([^"]*)" (file|folder) "([^"]*)" should exist$/,
+  function (userId, resourceType, element) {
+    return fileOrFolderShouldExist(userId, element, resourceType)
+  }
+)
 
 Then(
-  'as {string} file/folder {string} should exist inside folder {string}',
-  function (user, file, folder) {
-    return fileShouldExist(user, path.join(folder, file))
+  /^as "([^"]*)" (file|folder) "([^"]*)" should exist on remote server$/,
+  function (userId, resourceType, element) {
+    return backendHelper.runOnRemoteBackend(fileOrFolderShouldExist, userId, element, resourceType)
+  }
+)
+
+Then(
+  /^as "([^"]*)" (file|folder) "([^"]*)" should exist inside folder "([^"]*)"$/,
+  function (user, resourceType, file, folder) {
+    return fileOrFolderShouldExist(user, path.join(folder, file), resourceType)
   }
 )
 
 Then('as {string} the last uploaded folder should exist', function (userId) {
-  return fileShouldExist(userId, client.sessionId)
+  return fileOrFolderShouldExist(userId, client.sessionId, 'folder')
 })
 
 Then(

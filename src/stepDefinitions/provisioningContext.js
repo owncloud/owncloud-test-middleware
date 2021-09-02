@@ -1,6 +1,7 @@
 const { client } = require('../config.js')
 const { Given, After } = require('../context')
 const fs = require('fs-extra')
+const assert = require('assert')
 require('url-search-params-polyfill')
 const httpHelper = require('../helpers/httpHelper')
 const backendHelper = require('../helpers/backendHelper')
@@ -108,6 +109,19 @@ async function createUser(
     })
 }
 
+async function createUserWithAttributes(
+  { username, password = false, displayname = false, email = false },
+  skeletonType = 'small',
+  initialize = false
+) {
+  password = password || userSettings.getPasswordForUser(username)
+  await deleteUser(username)
+  await createUser(username, password, displayname, email, skeletonType)
+  if (initialize) {
+    await initUser(username)
+  }
+}
+
 function deleteUser(userId) {
   userSettings.deleteUserFromCreatedUsersList(userId)
   const url = `cloud/users/${userId}`
@@ -117,6 +131,17 @@ function deleteUser(userId) {
 function initUser(userId) {
   const url = `cloud/users/${userId}`
   return httpHelper.getOCS(url, userId)
+}
+
+function editUser(userId, key, value) {
+  const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+  value = encodeURI(value)
+  const body = `key=${key}&value=${value}`
+
+  const url = `cloud/users/${userId}`
+  return httpHelper.putOCS(url, userId, body, headers)
 }
 
 /**
@@ -165,12 +190,6 @@ function blockUser(userId) {
   return httpHelper.putOCS(apiURL, 'admin')
 }
 
-Given('user {string} has been created with default attributes', async function (userId) {
-  await deleteUser(userId)
-  await createDefaultUser(userId, 'large')
-  await initUser(userId)
-})
-
 Given(
   /^user "([^"]*)" has been created with default attributes and (without|large|small) skeleton files$/,
   async function (userId, skeletonType) {
@@ -198,8 +217,8 @@ Given('user {string} has been created with default attributes on remote server',
 
 Given(
   /^user "([^"]*)" has been created with default attributes and (without|large|small) skeleton files on remote server$/,
-  function (userId) {
-    return backendHelper.runOnRemoteBackend(async function (skeletonType) {
+  function (userId, skeletonType) {
+    return backendHelper.runOnRemoteBackend(async function () {
       await deleteUser()
         .then(() => createDefaultUser(userId, skeletonType))
         .then(() => initUser(userId))
@@ -243,34 +262,25 @@ Given(
   }
 )
 
-Given('these users have been created but not initialized:', function (dataTable) {
-  codify.replaceInlineTable(dataTable)
-  return Promise.all(
-    dataTable.hashes().map((user) => {
-      const userId = user.username
-      const password = user.password || userSettings.getPasswordForUser(userId)
-      const displayName = user.displayname || false
-      const email = user.email || false
-      return deleteUser(userId).then(() =>
-        createUser(userId, password, displayName, email, 'large')
-      )
-    })
-  )
-})
-
 Given(
   /^these users have been created without initialization and (without|small|large) skeleton files:$/,
   function (skeletonType, dataTable) {
     codify.replaceInlineTable(dataTable)
     return Promise.all(
       dataTable.hashes().map((user) => {
-        const userId = user.username
-        const password = user.password || userSettings.getPasswordForUser(userId)
-        const displayName = user.displayname || false
-        const email = user.email || false
-        return deleteUser(userId).then(() =>
-          createUser(userId, password, displayName, email, skeletonType)
-        )
+        return createUserWithAttributes(user, skeletonType)
+      })
+    )
+  }
+)
+
+Given(
+  /^these users have been created with initialization and (without|small|large) skeleton files:$/,
+  function (skeletonType, dataTable) {
+    codify.replaceInlineTable(dataTable)
+    return Promise.all(
+      dataTable.hashes().map((user) => {
+        return createUserWithAttributes(user, skeletonType, true)
       })
     )
   }
@@ -317,19 +327,34 @@ Given('user {string} has been added to group {string}', function (userId, groupI
   return addToGroup(userId, groupId)
 })
 
+Given(
+  'the administrator has changed the display name of user {string} to {string}',
+  async function (userId, newDisplayName) {
+    await editUser(userId, 'displayname', newDisplayName).then(function (res) {
+      assert.strictEqual(
+        res.status,
+        200,
+        `As admin, cannot change displayname of user "${userId}" to "${newDisplayName}"`
+      )
+    })
+  }
+)
+
 After(async function () {
   const createdUsers = Object.keys(userSettings.getCreatedUsers('LOCAL'))
   const createdRemoteUsers = Object.keys(userSettings.getCreatedUsers('REMOTE'))
   const createdGroups = userSettings.getCreatedGroups()
 
   if (client.globals.ocis) {
-    const deleteSharePromises = createdUsers.map((user) => {
-      return sharingHelper.getAllSharesSharedByUser(user).then((shares) => {
-        if (shares.length) {
-          return Promise.all(shares.map((share) => sharingHelper.deleteShare(share.id, user)))
+    const deleteSharePromises = []
+    for (const user of createdUsers) {
+      const shares = await sharingHelper.getAllSharesSharedByUser(user)
+      if (shares.length) {
+        for (const share of shares) {
+          await sharingHelper.deleteShare(share.id, user)
         }
-      })
-    })
+      }
+    }
     await Promise.all(deleteSharePromises).catch((err) => {
       console.log('Error while deleting shares after test: ', err)
     })
@@ -356,7 +381,8 @@ After(async function () {
       userSettings.resetCreatedGroups()
     })
   } else {
-    await Promise.all([...createdUsers.map(deleteUser), ...createdGroups.map(deleteGroup)])
+    await Promise.all(createdUsers.map(deleteUser))
+    await Promise.all(createdGroups.map(deleteGroup))
   }
 
   if (client.globals.ocis) {

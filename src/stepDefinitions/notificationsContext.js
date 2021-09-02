@@ -14,7 +14,7 @@ Given('user {string} is sent a notification', function (user) {
     .then((res) => httpHelper.checkStatus(res, 'Could not generate notification.'))
 })
 
-Given('app {string} has been {string}', async function (app, action) {
+Given('app {string} has been {}', async function (app, action) {
   assert.ok(
     action === 'enabled' || action === 'disabled',
     "only supported either 'enabled' or 'disabled'. Passed: " + action
