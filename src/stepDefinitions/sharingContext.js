@@ -16,7 +16,7 @@ let timeOfLastShareOperation = Date.now()
 
 Given(
   'user {string} from remote server has shared {string} with user {string} from local server',
-  function (sharer, file, receiver) {
+  function(sharer, file, receiver) {
     receiver = util.format('%s@%s', receiver, client.globals.backend_url)
     return backendHelper.runOnRemoteBackend(
       shareFileFolder,
@@ -28,26 +28,9 @@ Given(
   }
 )
 
-/**
- * makes sure share operations are carried out maximum once a second to avoid same stime
- */
-const waitBetweenShareOperations = async function () {
-  const timeSinceLastShare = Date.now() - timeOfLastShareOperation
-  if (timeSinceLastShare <= 1001) {
-    await client.pause(1001 - timeSinceLastShare)
-  }
-}
-
-/**
- * update time in which the last share operation was carried out
- */
-const updateTimeOfLastShareOperation = function () {
-  timeOfLastShareOperation = Date.now()
-}
-
 Given(
   'user {string} from remote server has shared {string} with user {string} from local server with {string} permissions',
-  function (sharer, file, receiver, permission) {
+  function(sharer, file, receiver, permission) {
     receiver = util.format('%s@%s', receiver, client.globals.backend_url)
     return backendHelper.runOnRemoteBackend(
       shareFileFolder,
@@ -62,7 +45,7 @@ Given(
 
 When(
   'user {string} from remote server shares {string} with user {string} from local server',
-  function (sharer, file, receiver) {
+  function(sharer, file, receiver) {
     receiver = util.format('%s@%s', receiver, client.globals.backend_url)
     return backendHelper.runOnRemoteBackend(
       shareFileFolder,
@@ -73,6 +56,24 @@ When(
     )
   }
 )
+
+/**
+ * makes sure share operations are carried out maximum once a second to avoid same stime
+ */
+ const waitBetweenShareOperations = async function() {
+  const timeSinceLastShare = Date.now() - timeOfLastShareOperation
+  if (timeSinceLastShare <= 1001) {
+    await client.pause(1001 - timeSinceLastShare)
+  }
+}
+
+/**
+ * update time in which the last share operation was carried out
+ */
+const updateTimeOfLastShareOperation = function() {
+  timeOfLastShareOperation = Date.now()
+}
+
 
 /**
  * creates a new share
@@ -87,7 +88,7 @@ When(
  * @param {string} extraParams.password Password of the share (public links)
  * @param {string} extraParams.expireDate Expiry date of the share
  */
-const shareFileFolder = async function (
+ const shareFileFolder = async function(
   elementToShare,
   sharer,
   receiver = null,
@@ -121,12 +122,13 @@ const shareFileFolder = async function (
   const url = 'apps/files_sharing/api/v1/shares'
   await httpHelper
     .postOCS(url, sharer, params)
-    .then((res) => res.json())
-    .then(function (json) {
+    .then(res => res.json())
+    .then(function(json) {
       httpHelper.checkOCSStatus(json, 'Could not create share. Message: ' + json.ocs.meta.message)
     })
   await updateTimeOfLastShareOperation()
 }
+
 /**
  * create any share using dataTable
  *
@@ -136,33 +138,30 @@ const shareFileFolder = async function (
  *
  * @return void
  */
-Given(
-  'user {string} has created a new share with following settings',
-  function (sharer, dataTable) {
-    const settings = dataTable.rowsHash()
-    const expireDate = settings.expireDate
-    let dateToSet = ''
-    if (typeof expireDate !== 'undefined') {
-      dateToSet = sharingHelper.calculateDate(expireDate)
-    }
-    let targetShareType = null
-    if (settings.shareTypeString) {
-      targetShareType = sharingHelper.humanReadableShareTypeToNumber(settings.shareTypeString)
-    }
-    return shareFileFolder(
-      settings.path,
-      sharer,
-      settings.shareWith,
-      targetShareType,
-      settings.permissionString,
-      settings.name,
-      {
-        expireDate: dateToSet,
-        password: settings.password,
-      }
-    )
+ Given('user {string} has created a new share with following settings', function(sharer, dataTable) {
+  const settings = dataTable.rowsHash()
+  const expireDate = settings.expireDate
+  let dateToSet = ''
+  if (typeof expireDate !== 'undefined') {
+    dateToSet = sharingHelper.calculateDate(expireDate)
   }
-)
+  let targetShareType = null
+  if (settings.shareTypeString) {
+    targetShareType = sharingHelper.humanReadableShareTypeToNumber(settings.shareTypeString)
+  }
+  return shareFileFolder(
+    settings.path,
+    sharer,
+    settings.shareWith,
+    targetShareType,
+    settings.permissionString,
+    settings.name,
+    {
+      expireDate: dateToSet,
+      password: settings.password
+    }
+  )
+})
 
 /**
  * sets up data into a standard format for creating new public link share
@@ -177,7 +176,7 @@ Given(
  * @param {string} data.permissions Allowed permissions on the share
  * @param {string} data.expireDate Expiry date of the share
  */
-const createPublicLink = function (sharer, data) {
+ const createPublicLink = function(sharer, data) {
   let { path, permissions = 'read', name, password, expireDate } = data
 
   if (typeof expireDate !== 'undefined') {
@@ -186,16 +185,16 @@ const createPublicLink = function (sharer, data) {
 
   return shareFileFolder(path, sharer, null, SHARE_TYPES.public_link, permissions, name, {
     password,
-    expireDate,
+    expireDate
   })
 }
 
-const checkReceivedSharesExpirationDate = function (user, target, days) {
+const checkReceivedSharesExpirationDate = function(user, target, days) {
   const apiURL = 'apps/files_sharing/api/v1/shares?shared_with_me=true'
   return httpHelper
     .getOCS(apiURL, user)
-    .then((res) => res.json())
-    .then(function (result) {
+    .then(res => res.json())
+    .then(function(result) {
       httpHelper.checkOCSStatus(result, 'Could not get shares. Message: ' + result.ocs.meta.message)
       const shares = result.ocs.data
       const currentDate = new Date()
@@ -229,44 +228,47 @@ const checkReceivedSharesExpirationDate = function (user, target, days) {
     })
 }
 
-Given(
-  'user {string} has shared file/folder {string} with user {string}',
-  function (sharer, elementToShare, receiver) {
-    return shareFileFolder(elementToShare, sharer, receiver)
-  }
-)
+Given('user {string} has shared file/folder {string} with user {string}', function(
+  sharer,
+  elementToShare,
+  receiver
+) {
+  return shareFileFolder(elementToShare, sharer, receiver)
+})
 
 Given(
   'user {string} has shared file/folder {string} with user {string} with {string} permission/permissions',
-  function (sharer, elementToShare, receiver, permissions) {
+  function(sharer, elementToShare, receiver, permissions) {
     return shareFileFolder(elementToShare, sharer, receiver, SHARE_TYPES.user, permissions)
   }
 )
 
-Given(
-  'user {string} has shared file/folder {string} with group {string}',
-  function (sharer, elementToShare, receiver) {
-    return shareFileFolder(elementToShare, sharer, receiver, SHARE_TYPES.group)
-  }
-)
+Given('user {string} has shared file/folder {string} with group {string}', function(
+  sharer,
+  elementToShare,
+  receiver
+) {
+  return shareFileFolder(elementToShare, sharer, receiver, SHARE_TYPES.group)
+})
 
 Given(
   'user {string} has shared file/folder {string} with group {string} with {string} permission/permissions',
-  function (sharer, elementToShare, receiver, permissions) {
+  function(sharer, elementToShare, receiver, permissions) {
     return shareFileFolder(elementToShare, sharer, receiver, SHARE_TYPES.group, permissions)
   }
 )
 
-Given(
-  'user {string} has shared file/folder {string} with link with {string} permissions',
-  function (sharer, elementToShare, permissions) {
-    return shareFileFolder(elementToShare, sharer, null, SHARE_TYPES.public_link, permissions)
-  }
-)
+Given('user {string} has shared file/folder {string} with link with {string} permissions', function(
+  sharer,
+  elementToShare,
+  permissions
+) {
+  return shareFileFolder(elementToShare, sharer, null, SHARE_TYPES.public_link, permissions)
+})
 
 Given(
   'user {string} has shared file/folder {string} with link with {string} permissions and password {string}',
-  function (sharer, elementToShare, permissions, password) {
+  function(sharer, elementToShare, permissions, password) {
     return shareFileFolder(
       elementToShare,
       sharer,
@@ -279,11 +281,11 @@ Given(
   }
 )
 
-Given('the administrator has enabled exclude groups from sharing', function () {
+Given('the administrator has enabled exclude groups from sharing', function() {
   return runOcc(['config:app:set core shareapi_exclude_groups --value=yes'])
 })
 
-Given('the administrator has excluded group {string} from sharing', async function (group) {
+Given('the administrator has excluded group {string} from sharing', async function(group) {
   const configList = await runOcc(['config:list'])
   const config = _.get(configList, 'ocs.data.stdOut')
   const configParsed = JSON.parse(config)
@@ -292,126 +294,132 @@ Given('the administrator has excluded group {string} from sharing', async functi
   )
   if (!initialExcludedGroup.includes(group)) {
     initialExcludedGroup.push(group)
-    const resultGroupList = initialExcludedGroup.map((res) => '"' + res + '"')
+    const resultGroupList = initialExcludedGroup.map(res => '"' + res + '"')
     const resultToString = resultGroupList.join(',')
     return runOcc([
       'config:app:set',
       'core',
       'shareapi_exclude_groups_list',
-      '--value=[' + resultToString + ']',
+      '--value=[' + resultToString + ']'
     ])
   }
 })
 
 Given(
   'the administrator has set the minimum characters for sharing autocomplete to {string}',
-  function (value) {
+  function(value) {
     return runOcc(['config:system:set user.search_min_length --value=' + value])
   }
 )
 
-Given(
-  'user {string} has created a public link with following settings',
-  function (sharer, dataTable) {
-    return createPublicLink(sharer, dataTable.rowsHash())
-  }
-)
+Given('user {string} has created a public link with following settings', function(
+  sharer,
+  dataTable
+) {
+  return createPublicLink(sharer, dataTable.rowsHash())
+})
 
-Given(
-  'the administrator has excluded group {string} from receiving shares',
-  async function (group) {
-    const configList = await runOcc(['config:list'])
-    const config = _.get(configList, 'ocs.data.stdOut')
-    const configParsed = JSON.parse(config)
-    const initialExcludedGroup = JSON.parse(
-      _.get(configParsed, 'apps.files_sharing.blacklisted_receiver_groups') || '[]'
-    )
-    if (!initialExcludedGroup.includes(group)) {
-      initialExcludedGroup.push(group)
-      let excludedGroups = initialExcludedGroup.map((res) => `"${res}"`)
-      excludedGroups = excludedGroups.join(',')
-      return runOcc([
-        'config:app:set',
-        'files_sharing',
-        'blacklisted_receiver_groups',
-        '--value=[' + excludedGroups + ']',
-      ])
-    }
+Given('the administrator has excluded group {string} from receiving shares', async function(group) {
+  const configList = await runOcc(['config:list'])
+  const config = _.get(configList, 'ocs.data.stdOut')
+  const configParsed = JSON.parse(config)
+  const initialExcludedGroup = JSON.parse(
+    _.get(configParsed, 'apps.files_sharing.blacklisted_receiver_groups') || '[]'
+  )
+  if (!initialExcludedGroup.includes(group)) {
+    initialExcludedGroup.push(group)
+    let excludedGroups = initialExcludedGroup.map(res => `"${res}"`)
+    excludedGroups = excludedGroups.join(',')
+    return runOcc([
+      'config:app:set',
+      'files_sharing',
+      'blacklisted_receiver_groups',
+      '--value=[' + excludedGroups + ']'
+    ])
   }
-)
+})
 
-Then('user {string} should not have received any shares', function (user) {
+Then('user {string} should have received a share with these details:', function(
+  user,
+  expectedDetailsTable
+) {
+  return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable, {
+    shared_with_me: true
+  })
+})
+
+Then('user {string} should not have received any shares', function(user) {
   return sharingHelper.assertUserHasNoShares(user)
 })
 
-Given(
-  'user {string} has created a new public link for resource {string}',
-  function (user, resource) {
-    return shareFileFolder(resource, user, '', SHARE_TYPES.public_link)
-  }
-)
+Given('user {string} has created a new public link for resource {string}', function(
+  user,
+  resource
+) {
+  return shareFileFolder(resource, user, '', SHARE_TYPES.public_link)
+})
 
-Then(
-  'user {string} should have shared a file/folder with these details:',
-  function (user, expectedDetailsTable) {
-    return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable, {
-      shared_with_me: false,
-    })
-  }
-)
+Then('user {string} should have shared a file/folder with these details:', function(
+  user,
+  expectedDetailsTable
+) {
+  return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable, {
+    shared_with_me: false
+  })
+})
 
-Then(
-  'user {string} should have shared a file/folder {string} with these details:',
-  function (user, path, expectedDetailsTable) {
-    return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable, {
-      shared_with_me: false,
-      path,
-    })
-  }
-)
+Then('user {string} should have shared a file/folder {string} with these details:', function(
+  user,
+  path,
+  expectedDetailsTable
+) {
+  return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable, {
+    shared_with_me: false,
+    path
+  })
+})
 
-Then(
-  'user {string} should have a share with these details:',
-  function (user, expectedDetailsTable) {
-    return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable)
-  }
-)
+Then('user {string} should have a share with these details:', function(user, expectedDetailsTable) {
+  return sharingHelper.assertUserHasShareWithDetails(user, expectedDetailsTable)
+})
 
-Given(
-  'user {string} has declined the share {string} offered by user {string}',
-  function (user, filename, sharer) {
-    return sharingHelper.declineShare(filename, user, sharer)
-  }
-)
+Given('user {string} has declined the share {string} offered by user {string}', function(
+  user,
+  filename,
+  sharer
+) {
+  return sharingHelper.declineShare(filename, user, sharer)
+})
 
-Given(
-  'user {string} has accepted the share {string} offered by user {string}',
-  function (user, filename, sharer) {
-    return sharingHelper.acceptShare(filename, user, sharer)
-  }
-)
+Given('user {string} has accepted the share {string} offered by user {string}', function(
+  user,
+  filename,
+  sharer
+) {
+  return sharingHelper.acceptShare(filename, user, sharer)
+})
 
 When(
   'user {string} accepts the share {string} offered by user {string} using the sharing API',
-  function (user, filename, sharer) {
+  function(user, filename, sharer) {
     return sharingHelper.acceptShare(filename, user, sharer)
   }
 )
 
-Given(
-  'user {string} from server {string} has accepted the last pending share',
-  function (user, server) {
-    if (server === backendHelper.BACKENDS.remote) {
-      return backendHelper.runOnRemoteBackend(() => sharingHelper.acceptLastPendingShare(user))
-    } else {
-      return sharingHelper.acceptLastPendingShare(user)
-    }
+Given('user {string} from server {string} has accepted the last pending share', function(
+  user,
+  server
+) {
+  if (server === backendHelper.BACKENDS.remote) {
+    return backendHelper.runOnRemoteBackend(() => sharingHelper.acceptLastPendingShare(user))
+  } else {
+    return sharingHelper.acceptLastPendingShare(user)
   }
-)
+})
 
 When(
   'user {string} from server {string} accepts the last pending share using the sharing API',
-  function (user, server) {
+  function(user, server) {
     if (server === backendHelper.BACKENDS.remote) {
       return backendHelper.runOnRemoteBackend(() => sharingHelper.acceptLastPendingShare(user))
     } else {
@@ -420,34 +428,33 @@ When(
   }
 )
 
-Then('user {string} should not have created any shares', async function (user) {
+Then('user {string} should not have created any shares', async function(user) {
   const shares = await sharingHelper.getAllSharesSharedByUser(user)
   assert.strictEqual(shares.length, 0, 'There should not be any share, but there are')
 })
 
 Then(
   'user {string} should have received a share with target {string} and expiration date in {int} day/days',
-  function (user, target, days) {
+  function(user, target, days) {
     return checkReceivedSharesExpirationDate(user, target, days)
   }
 )
 
-Given(
-  'the administrator has set the default folder for received shares to {string}',
-  function (folder) {
-    if (client.globals.ocis) {
-      if (folder === 'Shares') {
-        return
-      }
-      throw Error(`Cannot set ${folder} as default share received folder in OCIS`)
+Given('the administrator has set the default folder for received shares to {string}', function(
+  folder
+) {
+  if (client.globals.ocis) {
+    if (folder === 'Shares') {
+      return
     }
-    return runOcc([`config:system:set share_folder --value=${folder}`])
+    throw Error(`Cannot set ${folder} as default share received folder in OCIS`)
   }
-)
+  return runOcc([`config:system:set share_folder --value=${folder}`])
+})
 
 Given(
   'the administrator has set the default folder for received shares to {string} on remote server',
-  function (folder) {
+  function(folder) {
     if (client.globals.ocis) {
       if (folder === 'Shares') {
         return
@@ -455,7 +462,7 @@ Given(
       throw Error(`Cannot set ${folder} as default share received folder in OCIS`)
     }
     return backendHelper.runOnRemoteBackend(runOcc, [
-      [`config:system:set share_folder --value=${folder}`],
+      [`config:system:set share_folder --value=${folder}`]
     ])
   }
 )

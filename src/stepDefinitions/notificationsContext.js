@@ -4,17 +4,17 @@ const httpHelper = require('../helpers/httpHelper')
 const assert = require('assert')
 const util = require('util')
 
-Given('user {string} is sent a notification', function (user) {
+Given('user {string} is sent a notification', function(user) {
   const body = new URLSearchParams()
   body.append('user', user)
   const apiURL = 'apps/testing/api/v1/notifications'
 
   return httpHelper
     .postOCS(apiURL, 'admin', body)
-    .then((res) => httpHelper.checkStatus(res, 'Could not generate notification.'))
+    .then(res => httpHelper.checkStatus(res, 'Could not generate notification.'))
 })
 
-Given('app {string} has been {}', async function (app, action) {
+Given('app {string} has been {string}', async function(app, action) {
   assert.ok(
     action === 'enabled' || action === 'disabled',
     "only supported either 'enabled' or 'disabled'. Passed: " + action
@@ -33,11 +33,11 @@ Given('app {string} has been {}', async function (app, action) {
   const response =
     (await action) === 'enabled' ? httpHelper.postOCS(apiURL) : httpHelper.deleteOCS(apiURL)
   response
-    .then((res) => {
+    .then(res => {
       httpHelper.checkStatus(res, errorMessage)
       return res.json()
     })
-    .then((data) => {
+    .then(data => {
       httpHelper.checkOCSStatus(data, errorMessage)
     })
 })
