@@ -112,6 +112,10 @@ function getActualSkeletonDir(skeletonType) {
     case 'small':
       directoryName = 'apiSkeleton'
       break
+    case 'without':
+      // "tinySkeleton" is an empty folder
+      directoryName = 'tinySkeleton'
+      break
     default:
       directoryName = false
       break
