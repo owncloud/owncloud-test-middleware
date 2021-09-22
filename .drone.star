@@ -1,7 +1,7 @@
 config = {
 	'app': 'owncloud-test-middleware',
 
-	'lintTests': True,
+	'lintTests': False,
 
 	'unitTests': True,
 
