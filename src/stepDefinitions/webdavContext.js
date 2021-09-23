@@ -15,10 +15,11 @@ const path = require('../helpers/path')
  * @param {string} element - path
  * @returns {Promise<Response|Error>}
  */
-function fileExists(userId, element) {
+ function fileExists(userId, element) {
   const davPath = webdavHelper.createDavPath(userId, element)
   return httpHelper.propfind(davPath, userId)
 }
+
 /**
  * request a single file
  * @param {string} userId - username
@@ -30,8 +31,8 @@ function getFile(userId, element) {
   return httpHelper.get(davPath, userId)
 }
 
-const fileShouldHaveContent = async function (userId, file, content) {
-  const textContent = await getFile(userId, file).then((res) => res.text())
+const fileShouldHaveContent = async function(userId, file, content) {
+  const textContent = await getFile(userId, file).then(res => res.text())
   return assert.strictEqual(
     textContent,
     content,
@@ -39,8 +40,8 @@ const fileShouldHaveContent = async function (userId, file, content) {
   )
 }
 
-const fileShouldNotHaveContent = async function (userId, file, content) {
-  const textContent = await getFile(userId, file).then((res) => res.text())
+const fileShouldNotHaveContent = async function(userId, file, content) {
+  const textContent = await getFile(userId, file).then(res => res.text())
   return assert.notStrictEqual(
     textContent,
     content,
@@ -48,52 +49,98 @@ const fileShouldNotHaveContent = async function (userId, file, content) {
   )
 }
 
-const fileShouldExist = function (userId, element) {
-  return fileExists(userId, element).then(function (res) {
-    assert.strictEqual(res.status, 207, 'File should exist, but does not')
-  })
+const getResourceType = function(data) {
+  let resourceType
+
+  const result = xml2js(data, { compact: true })
+  const responses = _.get(result, 'd:multistatus.d:response')
+  if (responses instanceof Array) {
+    resourceType = _.get(responses[0], 'd:propstat.d:prop.d:resourcetype')
+  } else {
+    resourceType = _.get(responses, 'd:propstat.d:prop.d:resourcetype')
+  }
+
+  if (Object.keys(resourceType)[0] === 'd:collection') {
+    return 'folder'
+  } else {
+    return 'file'
+  }
 }
 
-const fileShouldNotExist = function (userId, element) {
-  return fileExists(userId, element).then(function (res) {
+const assertResourceType = function(data, resource, type = 'file') {
+  type = type.toLowerCase()
+
+  const foundType = getResourceType(data)
+
+  const exists = foundType === type
+  assert.strictEqual(
+    exists,
+    true,
+    `Expected "${resource}" to be a "${type}", but found "${foundType}"`
+  )
+}
+
+const fileOrFolderShouldExist = function(userId, element, type = 'file') {
+  return fileExists(userId, element)
+    .then(function(res) {
+      assert.strictEqual(res.status, 207, `Resource "${element}" should exist, but does not`)
+      return res.text()
+    })
+    .then(function(data) {
+      assertResourceType(data, element, type)
+    })
+}
+
+const fileShouldNotExist = function(userId, element) {
+  return fileExists(userId, element).then(function(res) {
     assert.ok(res.status < 300 || res.status >= 200, 'file/folder should not exist, but does')
   })
 }
 
-Then('as {string} file/folder {string} should not exist', function (userId, element) {
+Then('as {string} file/folder {string} should not exist', function(userId, element) {
   return fileShouldNotExist(userId, element)
 })
 
-Then(
-  'as {string} file/folder {string} should not exist on remote server',
-  function (userId, element) {
-    return backendHelper.runOnRemoteBackend(fileShouldNotExist, userId, element)
-  }
-)
-
-Then('as {string} file/folder {string} should exist', function (userId, element) {
-  return fileShouldExist(userId, element)
+Then('as {string} file/folder {string} should not exist on remote server', function(
+  userId,
+  element
+) {
+  return backendHelper.runOnRemoteBackend(fileShouldNotExist, userId, element)
 })
 
-Then('as {string} file/folder {string} should exist on remote server', function (userId, element) {
-  return backendHelper.runOnRemoteBackend(fileShouldExist, userId, element)
+Then(/^as "([^"]*)" (file|folder) "([^"]*)" should exist$/, function(
+  userId,
+  resourceType,
+  element
+) {
+  return fileOrFolderShouldExist(userId, element, resourceType)
 })
 
-Then(
-  'as {string} file/folder {string} should exist inside folder {string}',
-  function (user, file, folder) {
-    return fileShouldExist(user, path.join(folder, file))
-  }
-)
+Then(/^as "([^"]*)" (file|folder) "([^"]*)" should exist on remote server$/, function(
+  userId,
+  resourceType,
+  element
+) {
+  return backendHelper.runOnRemoteBackend(fileOrFolderShouldExist, userId, element, resourceType)
+})
 
-Then('as {string} the last uploaded folder should exist', function (userId) {
-  return fileShouldExist(userId, client.sessionId)
+Then(/^as "([^"]*)" (file|folder) "([^"]*)" should exist inside folder "([^"]*)"$/, function(
+  user,
+  resourceType,
+  file,
+  folder
+) {
+  return fileOrFolderShouldExist(user, path.join(folder, file), resourceType)
+})
+
+Then('as {string} the last uploaded folder should exist', function(userId) {
+  return fileOrFolderShouldExist(userId, client.sessionId, 'folder')
 })
 
 Then(
   'as {string} the last uploaded folder should contain the following files inside the sub-folders:',
-  async function (user, files) {
-    files = files.raw().map((item) => item[0])
+  async function(user, files) {
+    files = files.raw().map(item => item[0])
 
     const sessionId = client.sessionId
     const response = await webdavHelper.propfind(
@@ -109,15 +156,13 @@ Then(
       throw new Error('Received unexpected response:\n' + result)
     }
 
-    const uploadedFilesHref = elements
-      .map((elem) => _.get(elem, 'd:href._text'))
-      .filter((item) => item)
+    const uploadedFilesHref = elements.map(elem => _.get(elem, 'd:href._text')).filter(item => item)
 
     const regexToExtractBaseName = RegExp(`/${sessionId}/upload[0-9]+file/(.*)`)
     const uploadedFilesWithBaseName = uploadedFilesHref
       // unmatched items return null, else is array
-      .map((file) => _.nth(file.match(regexToExtractBaseName), 1))
-      .filter((item) => item)
+      .map(file => _.nth(file.match(regexToExtractBaseName), 1))
+      .filter(item => item)
 
     const filesNotFoundInUploads = _.difference(files, uploadedFilesWithBaseName)
     assert.strictEqual(
@@ -129,7 +174,7 @@ Then(
   }
 )
 
-Given('user {string} has favorited element {string}', function (userId, element) {
+Given('user {string} has favorited element {string}', function(userId, element) {
   const body =
     '<?xml version="1.0"?>\n' +
     '<d:propertyupdate xmlns:d="DAV:"\n' +
@@ -141,7 +186,7 @@ Given('user {string} has favorited element {string}', function (userId, element)
 
   return httpHelper
     .proppatch(webdavHelper.createDavPath(userId, element), userId, body)
-    .then(function (res) {
+    .then(function(res) {
       if (res.status === 207) {
         return res
       } else {
@@ -150,20 +195,20 @@ Given('user {string} has favorited element {string}', function (userId, element)
     })
 })
 
-Then(
-  'as {string} file/folder {string} should exist in the trashbin',
-  async function (user, element) {
-    const items = await webdavHelper.getTrashBinElements(user)
-    const trashFiles = items.map((item) => item.originalFilename)
-    assert.strictEqual(trashFiles.includes(element), true)
-  }
-)
+Then('as {string} file/folder {string} should exist in the trashbin', async function(
+  user,
+  element
+) {
+  const items = await webdavHelper.getTrashBinElements(user)
+  const trashFiles = items.map(item => item.originalFilename)
+  assert.strictEqual(trashFiles.includes(element), true)
+})
 
 Then(
   'as {string} the file/folder with original path {string} should not exist in the trashbin',
-  function (user, path) {
-    return webdavHelper.getTrashBinElements(user).then((items) => {
-      const trashFiles = items.map((item) => item.originalLocation)
+  function(user, path) {
+    return webdavHelper.getTrashBinElements(user).then(items => {
+      const trashFiles = items.map(item => item.originalLocation)
       assert.strictEqual(trashFiles.includes(path), false)
     })
   }
@@ -171,24 +216,27 @@ Then(
 
 Then(
   'as {string} the file/folder with original path {string} should exist in the trashbin',
-  function (user, path) {
-    return webdavHelper.getTrashBinElements(user).then((items) => {
-      const trashFiles = items.map((item) => item.originalLocation)
+  function(user, path) {
+    return webdavHelper.getTrashBinElements(user).then(items => {
+      const trashFiles = items.map(item => item.originalLocation)
       assert.strictEqual(trashFiles.includes(path), true)
     })
   }
 )
 
-Then(
-  'as {string} the file {string} should have the content {string}',
-  function (user, file, content) {
-    return fileShouldHaveContent(user, file, content)
-  }
-)
+Then('as {string} the file {string} should have the content {string}', function(
+  user,
+  file,
+  content
+) {
+  return fileShouldHaveContent(user, file, content)
+})
 
-Then(
-  'as {string} the file {string} should not have the content {string}',
-  function (user, file, content) {
-    return fileShouldNotHaveContent(user, file, content)
-  }
-)
+Then('as {string} the file {string} should not have the content {string}', function(
+  user,
+  file,
+  content
+) {
+  return fileShouldNotHaveContent(user, file, content)
+})
+

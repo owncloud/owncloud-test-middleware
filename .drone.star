@@ -50,17 +50,13 @@ def integrationTests():
 				steps += fixPermissions()
 				steps += [{
 					"name": suite["name"],
-					"image": "owncloudci/php:7.4",
+					"image": "owncloudci/nodejs:14",
 					"pull": "always",
 					"environment": {
 						"CORE_PATH": "/var/www/owncloud/server",
 						"BACKEND_HOST": "http://owncloud"
 					},
 					"commands": [
-						"apt update",
-						"curl -sL https://deb.nodesource.com/setup_14.x | bash -",
-						"apt install -y nodejs",
-						'node -v',
 						suite["command"],
 					]
 				}]

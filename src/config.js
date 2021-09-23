@@ -18,7 +18,7 @@ const OCIS_REVA_DATA_ROOT = process.env.OCIS_REVA_DATA_ROOT || '/var/tmp/ocis/st
 const LDAP_SERVER_URL = process.env.LDAP_SERVER_URL || 'ldap://127.0.0.1'
 const LDAP_BASE_DN = process.env.LDAP_BASE_DN || 'cn=admin,dc=owncloud,dc=com'
 const LDAP_ADMIN_PASSWORD = process.env.LDAP_ADMIN_PASSWORD || 'admin'
-const TESTING_DATA_DIR = process.env.TESTING_DATA_DIR || '../testing/data'
+const TESTING_DATA_DIR = process.env.TESTING_DATA_DIR || path.join(__dirname, '../data')
 
 const config = {
   globals: {
