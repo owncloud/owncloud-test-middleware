@@ -60,12 +60,14 @@ When(
 /**
  * makes sure share operations are carried out maximum once a second to avoid same stime
  */
- const waitBetweenShareOperations = async function() {
+ const waitBetweenShareOperations = function() {
   const timeSinceLastShare = Date.now() - timeOfLastShareOperation
   if (timeSinceLastShare <= 1001) {
-    await client.pause(1001 - timeSinceLastShare)
+    return new Promise(resolve => {
+      setTimeout(resolve, 1001 - timeSinceLastShare)
+    })
   }
-}
+ }
 
 /**
  * update time in which the last share operation was carried out
