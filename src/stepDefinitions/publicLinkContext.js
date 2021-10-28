@@ -25,6 +25,19 @@ Then('user {string} should have some public shares', async function(sharer) {
   }
 })
 
+Then(
+  'as user {string} the file/folder {string} should have a public link',
+  async function(linkCreator, resource) {
+    const publicLinkShares = await sharingHelper.getAllPublicLinkShares(linkCreator)
+    resource = path.resolve(resource)
+    for (const share of publicLinkShares) {
+      if (share.path === resource && share.share_type === SHARE_TYPES.public_link) {
+        return
+      }
+    }
+  }
+)
+
 Then('the fields of the last public link share response of user {string} should include', function(
   linkCreator,
   dataTable
@@ -53,3 +66,24 @@ Then('as user {string} the folder {string} should not have any public link', asy
   }
   return this
 })
+
+Then(
+  'the public should be able to download the file/folder {string} without password from the last created public link by {string}',
+  function(resource, linkCreator) {
+    return sharingHelper.downloadLastPublicLinkResource(linkCreator, resource)
+  }
+)
+
+Then(
+  'the public should be able to download the file/folder {string} with password {string} from the last created public link by {string}',
+  function(resource, password, linkCreator) {
+    return sharingHelper.downloadLastPublicLinkResource(linkCreator, resource, password)
+  }
+)
+
+Then(
+  'the public should not be able to download the file/folder {string} from the last created public link by {string}',
+  function(resource, linkCreator) {
+    return sharingHelper.downloadLastPublicLinkResource(linkCreator, resource)
+  }
+)

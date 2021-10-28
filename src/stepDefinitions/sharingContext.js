@@ -468,3 +468,10 @@ Given(
     ])
   }
 )
+
+Given(
+  'user {string} has updated the share permissions for file/folder {string} to {string} for user {string}',
+  function(sharer, resource, permissions, receiver) {
+    return sharingHelper.updateSharedFilePermissionByUser(sharer, resource, permissions, receiver)
+  }
+)
