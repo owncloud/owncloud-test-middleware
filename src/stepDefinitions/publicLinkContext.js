@@ -46,7 +46,7 @@ Then('the fields of the last public link share response of user {string} should 
   return sharingHelper.assertUserLastPublicShareDetails(linkCreator, fieldsData)
 })
 
-Then('as user {string} the folder {string} should not have any public link', async function(
+Then('as user {string} the file/folder {string} should not have any public link', async function(
   sharer,
   resource
 ) {
