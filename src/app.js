@@ -83,7 +83,7 @@ app.use('/execute', async (req, res) => {
 
 app.use('/init', async (req, res) => {
   if (req.method !== 'POST') {
-    res.writeHead(405).end()
+    return res.writeHead(405).end()
   }
   try {
     if (!client.globals.ocis) {
@@ -92,7 +92,7 @@ app.use('/init', async (req, res) => {
     await testContext.setup()
     initialized = true
     log.info('test middleware initialized')
-    res
+    return res
       .status(200)
       .json({
         success: true,
@@ -109,7 +109,7 @@ app.use('/init', async (req, res) => {
       log.error(message)
       return res.status(500).json({ success: false, message }).end()
     }
-    res.status(400).send(e.stack).end()
+    return res.status(400).send(e.stack).end()
   }
 })
 
