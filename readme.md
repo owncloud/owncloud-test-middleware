@@ -19,7 +19,7 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
 
     execute a gherkin step
     ```
-    curl -XPOST http://localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes"}' -H "Content-Type: application/json"
+    curl -XPOST http://localhost:3000/execute -d '{"step": "Given user \"Alice\" has been created with default attributes and without skeleton files"}' -H "Content-Type: application/json"
     ```
 
     Gherkin data tables are passed as a simple 2D array in json
