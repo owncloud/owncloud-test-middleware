@@ -31,7 +31,7 @@ trigger = {
 
 
 def main(ctx):
-	return lintTest() + unitTests() + integrationTests()
+	return lintTest() + unitTests() + integrationTests() + docker(ctx)
 
 
 def integrationTests():
@@ -231,4 +231,47 @@ def setupServer(testingServer, testingAppRequired=True):
 			"php occ config:system:set trusted_domains 1 --value=owncloud",
 			"php occ config:system:set trusted_domains 2 --value=" + testingServer,
 		]
+	}]
+
+def docker(ctx):
+	result = {
+		"kind": "pipeline",
+		"type": "docker",
+		"name": "docker",
+				"workspace": {
+					"base": "/var/www/owncloud",
+					"path": config["app"],
+				},
+		"steps": buildDockerImage(),
+		"trigger": {
+			"ref": [
+				"refs/heads/master",
+				"refs/tags/**",
+			],
+		},
+	}
+
+	return [result]
+
+def buildDockerImage():
+	return [{
+		"name": "build-docker-image",
+		"image": "plugins/docker:18.09",
+		"settings": {
+			"username": {
+				"from_secret": "docker_username",
+			},
+			"password": {
+				"from_secret": "docker_password",
+			},
+			"auto_tag": True,
+			"repo": "owncloud/owncloud-test-middleware",
+		},
+		"when": {
+			"ref": {
+				"exclude": [
+					"refs/pull/**",
+				],
+			},
+		},
 	}]
