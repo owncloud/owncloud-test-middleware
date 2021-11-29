@@ -24,8 +24,9 @@ config = {
 
 trigger = {
 	'ref': [
+		'refs/heads/main',
 		'refs/pull/**',
-		'refs/tags/**'
+		'refs/tags/**',
 	]
 }
 
@@ -245,7 +246,7 @@ def docker(ctx):
 		"steps": buildDockerImage(),
 		"trigger": {
 			"ref": [
-				"refs/heads/master",
+				"refs/heads/main",
 				"refs/tags/**",
 			],
 		},
