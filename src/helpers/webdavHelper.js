@@ -191,22 +191,18 @@ exports.createFile = async function (user, fileName, contents = '') {
 
   if (uploadTimeStamps[user] && uploadTimeStamps[user][fileName]) {
     const timeSinceLastFileUpload = Date.now() - uploadTimeStamps[user][fileName]
-    if (timeSinceLastFileUpload <= 1001) {
-      await testHelper.customDelay(1001 - timeSinceLastFileUpload)
+    if (timeSinceLastFileUpload <= 1600) {
+      await testHelper.customDelay(1600 - timeSinceLastFileUpload)
     }
   }
-
-  return httpHelper
-    .put(davPath, user, contents)
-    .then(function (res) {
-      uploadTimeStamps[user] = uploadTimeStamps[user] || {}
-      uploadTimeStamps[user][fileName] = Date.now()
-      return httpHelper.checkStatus(
-        res,
-        `Could not create the file "${fileName}" for user "${user}".`
-      )
-    })
-    .then((res) => res.text())
+  const putResponse = await httpHelper.put(davPath, user, contents)
+  const statusResponse = await httpHelper.checkStatus(
+      putResponse,
+      `Could not create the file "${fileName}" for user "${user}".`
+  )
+  uploadTimeStamps[user] = uploadTimeStamps[user] || {}
+  uploadTimeStamps[user][fileName] = Date.now()
+  return statusResponse.text()
 }
 
 /**
