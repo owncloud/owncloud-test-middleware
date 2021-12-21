@@ -1,5 +1,7 @@
 ## oc Test middleware service
 
+Trigger CI
+
 This is a middleware server for testing owncloud (owncloud10 or OCIS) with different Clients. This server handles the operations which are required to "get the server to a certain state"
 
 ### How it works
