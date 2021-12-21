@@ -86,9 +86,11 @@ class StepDef {
     if (this.type === patternTypes.REGEX) {
       return this.matchRegexPattern(step)
     }
-    if (step.token !== this.token) {
-      return false
-    }
+
+    // TODO: Decide if this is necessary
+    // if (step.token !== this.token) {
+    //   return false
+    // }
 
     if (this.getPatterns().includes(step.pattern)) {
       let datalen = step.data.length
