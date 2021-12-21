@@ -163,7 +163,7 @@ def installCore(db):
 
 	return [{
 		"name": "install-core",
-		"image": "owncloudci/core",
+		"image": "owncloudci/core:nodejs14",
 		"pull": "always",
 		"settings": {
 			"core_path": "/var/www/owncloud/server",
