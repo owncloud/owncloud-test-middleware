@@ -6,6 +6,7 @@ const backendHelper = require('../helpers/backendHelper')
 const assert = require('assert')
 const fs = require('fs')
 const occHelper = require('../helpers/occHelper')
+const codify = require('../helpers/codify')
 
 Then(
   'as {string} the content of {string} should be the same as the content of local file {string}',
@@ -98,12 +99,12 @@ const setTrustedServer = function(url) {
   })
 }
 
-Given('server {code} has been added as trusted server', function(server) {
-  return setTrustedServer(server)
+Given('server {string} has been added as trusted server', function(server) {
+  return setTrustedServer(codify.replaceInlineCode(server))
 })
 
-Given('server {code} has been added as trusted server on remote server', function(url) {
-  return backendHelper.runOnRemoteBackend(setTrustedServer, url)
+Given('server {string} has been added as trusted server on remote server', function(url) {
+  return backendHelper.runOnRemoteBackend(setTrustedServer, codify.replaceInlineCode(url))
 })
 
 After(async function(testCase) {
