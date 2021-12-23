@@ -21,6 +21,8 @@ const LDAP_BASE_DN = process.env.LDAP_BASE_DN || 'cn=admin,dc=owncloud,dc=com'
 const LDAP_ADMIN_PASSWORD = process.env.LDAP_ADMIN_PASSWORD || 'admin'
 const TESTING_DATA_DIR = process.env.TESTING_DATA_DIR || path.join(__dirname, '../data')
 
+const assert = require('assert')
+
 if (RUN_ON_OCIS) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
@@ -41,6 +43,7 @@ const config = {
     testing_data_dir: TESTING_DATA_DIR,
     ldap_password: LDAP_ADMIN_PASSWORD,
   },
+  assert,
 }
 
 module.exports.client = config
