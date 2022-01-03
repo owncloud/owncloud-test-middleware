@@ -6,6 +6,7 @@ COPY package*.json ./
 COPY yarn.lock ./
 COPY data ./data
 COPY src ./src
+COPY filesForUpload ./filesForUpload
 
 RUN yarn
 
