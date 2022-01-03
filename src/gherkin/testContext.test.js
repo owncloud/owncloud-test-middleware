@@ -93,12 +93,9 @@ describe('test testContext', () => {
         return 0
       })
     } else {
-      try {
+      expect(() => {
         testContext.when(Data.pattern, 'abc')
-        throw new Error('Using action of not a function type should fail but it passed.')
-      } catch (err) {
-        expect(err.message).toBe('not function type')
-      }
+      }).toThrowError('not function type')
     }
   })
 
@@ -145,16 +142,11 @@ describe('test testContext', () => {
       return 0
     })
 
-    let errFound
-    try {
+    expect(() => {
       testContext.addstep('GIVEN', 'user {string} has been created', () => {
         return 0
       })
-      throw new Error('adding same step multiple times should fail')
-    } catch (err) {
-      errFound = err
-    }
-    expect(errFound.message).toBe('step already registered')
+    }).toThrowError('step already registered')
   })
 
   it('test given when and then functions', () => {

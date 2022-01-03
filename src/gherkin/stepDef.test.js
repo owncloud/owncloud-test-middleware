@@ -264,7 +264,7 @@ describe('Checking stepDef.match matches patterns', () => {
       let stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, (user, file, sharee) => {
         return 0
       })
-      for (pattern of data.patterns) {
+      for (const pattern of data.patterns) {
         const step = new Step(data.stepDef.token, pattern)
         const res = stepDef.match(step)
         expect(res).toBe(true)
@@ -274,7 +274,7 @@ describe('Checking stepDef.match matches patterns', () => {
       stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, (user, file) => {
         return 0
       })
-      for (pattern of data.patterns) {
+      for (const pattern of data.patterns) {
         const step = new Step(data.stepDef.token, pattern)
         const res = stepDef.match(step)
         expect(res).toBe(false)
@@ -284,7 +284,7 @@ describe('Checking stepDef.match matches patterns', () => {
       stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, (user, file) => {
         return 0
       })
-      for (pattern of data.patterns) {
+      for (const pattern of data.patterns) {
         const step = new Step('THEN', pattern)
         const res = stepDef.match(step)
         expect(res).toBe(false)
@@ -294,7 +294,7 @@ describe('Checking stepDef.match matches patterns', () => {
       stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, (user, file) => {
         return 0
       })
-      for (pattern of data.patterns) {
+      for (const pattern of data.patterns) {
         const step = new Step(data.stepDef.token, pattern, new Table([['test'], ['data']]))
         const res = stepDef.match(step)
         expect(res).toBe(false)
@@ -304,7 +304,7 @@ describe('Checking stepDef.match matches patterns', () => {
       stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, (user, file) => {
         return 0
       })
-      for (pattern of data.patterns) {
+      for (const pattern of data.patterns) {
         const step = new Step(
           data.stepDef.token,
           pattern + ' some extra text',
@@ -314,14 +314,11 @@ describe('Checking stepDef.match matches patterns', () => {
         expect(res).toBe(false)
       }
     } else {
-      try {
-        const stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, () => {
+      expect(() => {
+        new StepDef(data.stepDef.token, data.stepDef.pattern, () => {
           return 0
         })
-        throw new Error('creating invalid stepdef should fail but it passed', stepDef)
-      } catch (err) {
-        expect(err.message).toBe(data.errMessage)
-      }
+      }).toThrowError(data.errMessage)
     }
   })
 })
