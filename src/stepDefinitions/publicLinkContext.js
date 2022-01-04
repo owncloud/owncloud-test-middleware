@@ -38,7 +38,7 @@ Then(
   }
 )
 
-Then('the fields of the last public link share response of user {string} should include', function(
+Then('the last public link share response of user {string} should include following fields', function(
   linkCreator,
   dataTable
 ) {
