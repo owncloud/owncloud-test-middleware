@@ -100,7 +100,10 @@ Given('user {string} has renamed the following files', function(userId, table) {
 
 Given('user {string} has renamed file/folder {string} to {string}', webdav.move)
 
-Given('user {string} has created folder {string}', webdav.createFolder)
+Given(/user "([^"]*)" has created folder "(.+)"/gm, function(userId, folderName) {
+  folderName = folderName.replaceAll("\\", "")
+  return webdav.createFolder(userId, folderName)
+})
 
 Given('user {string} has created folder {string} on remote server', function(userId, folderName) {
   return backendHelper.runOnRemoteBackend(async function() {
@@ -115,7 +118,8 @@ Given('user {string} has created file {string} on remote server', function(userI
 })
 
 
-Given('user {string} has created file {string}', function(userId, fileName) {
+Given(/user "([^"]*)" has created file "(.+)"/, function(userId, fileName) {
+  fileName = fileName.replaceAll("\\", "")
   return webdav.createFile(userId, fileName, '')
 })
 
