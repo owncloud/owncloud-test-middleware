@@ -192,7 +192,7 @@ def lintTest():
 		'name': 'lint',
 		'steps': installDependencies() + [{
 			'name': 'lint test',
-			'image': 'node:latest',
+			'image': 'node:14',
 			'pull': 'always',
 			'commands': [
 				'yarn lint'
