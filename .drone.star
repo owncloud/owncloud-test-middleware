@@ -51,7 +51,7 @@ def integrationTests():
 				steps += fixPermissions()
 				steps += [{
 					"name": suite["name"],
-					"image": "owncloudci/nodejs:14",
+					"image": "owncloudci/nodejs:16",
 					"pull": "always",
 					"environment": {
 						"CORE_PATH": "/var/www/owncloud/server",
