@@ -100,7 +100,14 @@ Given('user {string} has renamed the following files', function(userId, table) {
 
 Given('user {string} has renamed file/folder {string} to {string}', webdav.move)
 
-Given('user {string} has created folder {string}', webdav.createFolder)
+// here regex is used so that it can capture steps that use escape characters on folder name
+// like : "folder with \"nested\" quote"
+Given(/user "([^"]*)" has created folder "(.+)"/gm, function(userId, folderName) {
+  // the captured regex won't filter the backslash present in steps with folder name "folder with \"nested\" quote"
+  // so we need to replace it and send it as `folder with "nested" quote`
+  folderName = folderName.replaceAll("\\", "")
+  return webdav.createFolder(userId, folderName)
+})
 
 Given('user {string} has created folder {string} on remote server', function(userId, folderName) {
   return backendHelper.runOnRemoteBackend(async function() {
@@ -114,8 +121,12 @@ Given('user {string} has created file {string} on remote server', function(userI
   })
 })
 
-
-Given('user {string} has created file {string}', function(userId, fileName) {
+// here regex is used so that it can capture steps that use escape characters on file name
+// like : "file with \"nested\" quote"
+Given(/user "([^"]*)" has created file "(.+)"/, function(userId, fileName) {
+  // the captured regex won't filter the backslash present in steps with folder name "file with \"nested\" quote"
+  // so we need to replace it and send it as `file with "nested" quote`
+  fileName = fileName.replaceAll("\\", "")
   return webdav.createFile(userId, fileName, '')
 })
 
