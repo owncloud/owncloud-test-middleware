@@ -102,7 +102,7 @@ Given('user {string} has renamed file/folder {string} to {string}', webdav.move)
 
 // here regex is used so that it can capture steps that use escape characters on folder name
 // like : "folder with \"nested\" quote"
-Given(/user "([^"]*)" has created folder "(.+)"/gm, function(userId, folderName) {
+Given(/user "([^"]*)" has created folder "(.+)"/, function(userId, folderName) {
   // the captured regex won't filter the backslash present in steps with folder name "folder with \"nested\" quote"
   // so we need to replace it and send it as `folder with "nested" quote`
   folderName = folderName.replaceAll("\\", "")
