@@ -45,7 +45,7 @@ For example, If we want to run a gherkin step `Given user "Alice" has been creat
 
 ### Integration with test frameworks
 The middleware service is designed to be used with gherkin test runners such as cucumber and behat. In order to integrate this service with the test suite, we need to find a way to capture the steps that need to be run in the middleware. Most test runners allow use of regex in the matching of the step definition. We can use any regex rule to match all the steps that need to run in the middleware. you can capture them at once and send them to the middleware service.
-for example, for all the steps you want to run in the middleware start them with `in the server`, then you can use regex `/^in the server (.*)$/` to capture all the steps
+for example, for all the steps you want to run in the middleware end them with `in the server`, then you can use regex `/^(.*) in the server$/` to capture all the steps
 
 eg. Cucumber Integration
 
@@ -54,8 +54,8 @@ eg. Cucumber Integration
 Feature: test feature
 
   Background:
-    Given in the server user "Alice" has been created with default attributes
-    And in the server user "Alice" has created folder "new folder"
+    Given user "Alice" has been created with default attributes in the server
+    And user "Alice" has created folder "new folder" in the server
   
   Scenario: ...
 ```
@@ -99,7 +99,7 @@ After(function() {
     })
 })
 
-Given(/^in the server (.*)$/, handler);
+Given(/^(.*) in the server$/, handler);
 ```
 
 **notes**
@@ -108,7 +108,9 @@ Given(/^in the server (.*)$/, handler);
 
 ### Config
 #### Server requirements:
-- `testing` app should be enabled (see [testing/README.md](https://github.com/owncloud/testing/blob/master/README.md))
+- `testing` app must be enabled to use steps that run `occ` commands or set ownCloud 10 system settings (see [testing/README.md](https://github.com/owncloud/testing/blob/master/README.md))
+
+Note: the `testing` app is not available on oCIS. When such steps are used against an oCIS server they will not be effective.
 
 #### Server specific config variables
 
