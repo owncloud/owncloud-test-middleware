@@ -166,15 +166,16 @@ exports.getTrashBinElements = function (user, depth = 2) {
  * @param {string} user
  * @param {string} folderName
  */
-exports.createFolder = function (user, folderName) {
+exports.createFolder = async function (user, folderName) {
   const davPath = exports.createDavPath(user, folderName)
-  return httpHelper
-    .mkcol(davPath, user)
-    .then((res) =>
-      httpHelper.checkStatus(res, `Could not create the folder "${folderName}" for user "${user}".`)
-    )
-    .then((res) => res.text())
+  const mkcolResponse = await httpHelper.mkcol(davPath, user)
+  const statusResponse = await httpHelper.checkStatus(
+      mkcolResponse,
+      `Could not create the folder "${folderName}" for user "${user}".`
+  )
+  return statusResponse.text()
 }
+
 /**
  * Create a file using webDAV api.
  *
