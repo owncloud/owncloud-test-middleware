@@ -1,3 +1,9 @@
+OC_CI_CORE = "owncloudci/core"
+OC_CI_NODEJS = "owncloudci/nodejs:16"
+OC_CI_PHP = "owncloudci/php:7.4"
+OC_UBUNTU = "owncloud/ubuntu:16.04"
+DOCKER_PLUGIN = "plugins/docker:18.09"
+
 config = {
 	'app': 'owncloud-test-middleware',
 
@@ -51,8 +57,7 @@ def integrationTests():
 				steps += fixPermissions()
 				steps += [{
 					"name": suite["name"],
-					"image": "owncloudci/nodejs:16",
-					"pull": "always",
+					"image": OC_CI_NODEJS,
 					"environment": {
 						"CORE_PATH": "/var/www/owncloud/server",
 						"BACKEND_HOST": "http://owncloud"
@@ -89,8 +94,7 @@ def integrationTests():
 def owncloudService():
 	return [{
 		"name": "owncloud",
-		"image": "owncloudci/php:7.4",
-		"pull": "always",
+		"image": OC_CI_PHP,
 		"environment": {
 			"APACHE_WEBROOT": "/var/www/owncloud/server/",
 		},
@@ -107,8 +111,7 @@ def owncloudService():
 def installDependencies():
 	return [{
 		"name": "yarn-install",
-		"image": "node:latest",
-		"pull": "always",
+		"image": OC_CI_NODEJS,
 		"commands": [
 			'yarn install'
 		],
@@ -118,8 +121,7 @@ def installDependencies():
 def fixPermissions():
 	return [{
 		"name": "fix-permissions",
-		"image": "owncloudci/php:7.4",
-		"pull": "always",
+		"image": OC_CI_PHP,
 		"commands": [
 			"cd /var/www/owncloud/server",
 			"chown www-data * -R",
@@ -130,8 +132,7 @@ def fixPermissions():
 def owncloudLog():
 	return [{
 		"name": "owncloud-log",
-		"image": "owncloud/ubuntu:16.04",
-		"pull": "always",
+		"image": OC_UBUNTU,
 		"detach": True,
 		"commands": [
 			"tail -f /var/www/owncloud/server/data/owncloud.log",
@@ -148,7 +149,6 @@ def mysqlDbService(db):
 	return [{
 		"name": dbName,
 		"image": db,
-		"pull": "always",
 		"environment": {
 			"MYSQL_USER": "owncloud",
 			"MYSQL_PASSWORD": "owncloud",
@@ -163,8 +163,7 @@ def installCore(db):
 
 	return [{
 		"name": "install-core",
-		"image": "owncloudci/core",
-		"pull": "always",
+		"image": OC_CI_CORE,
 		"settings": {
 			"core_path": "/var/www/owncloud/server",
 			"db_type": dbType,
@@ -192,7 +191,7 @@ def lintTest():
 		'name': 'lint',
 		'steps': installDependencies() + [{
 			'name': 'lint test',
-			'image': 'node:latest',
+			'image': OC_CI_NODEJS,
 			'pull': 'always',
 			'commands': [
 				'yarn lint'
@@ -211,7 +210,7 @@ def unitTests():
 		'name': 'unit-tests',
 		'steps': installDependencies() + [{
 			'name': 'unit-tests',
-			'image': 'node:latest',
+			'image': OC_CI_NODEJS,
 			'pull': 'always',
 			'commands': [
 				'yarn test:unit'
@@ -224,8 +223,7 @@ def unitTests():
 def setupServer(testingServer, testingAppRequired=True):
 	return [{
 		"name": "setup-server",
-		"image": "owncloudci/php:7.4",
-		"pull": "always",
+		"image": OC_CI_PHP,
 		"commands": [
 			"cd /var/www/owncloud/server",
 			"php occ a:e testing" if testingAppRequired else "php occ a:l testing",
@@ -257,7 +255,7 @@ def docker(ctx):
 def buildDockerImage():
 	return [{
 		"name": "build-docker-image",
-		"image": "plugins/docker:18.09",
+		"image": DOCKER_PLUGIN,
 		"settings": {
 			"username": {
 				"from_secret": "docker_username",
