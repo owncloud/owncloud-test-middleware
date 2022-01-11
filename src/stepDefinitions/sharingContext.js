@@ -200,7 +200,8 @@ const checkReceivedSharesExpirationDate = function(user, target, days) {
       httpHelper.checkOCSStatus(result, 'Could not get shares. Message: ' + result.ocs.meta.message)
       const shares = result.ocs.data
       const currentDate = new Date()
-      let expectedExpirationDate = new Date(currentDate.setDate(currentDate.getDate() + days))
+      const getDay = Number(currentDate.getDate()) + Number(days)
+      let expectedExpirationDate = new Date(currentDate.setDate(getDay))
       // Set time to midnight
       expectedExpirationDate = new Date(expectedExpirationDate.setHours(0, 0, 0, 0))
       let found = false
