@@ -1,7 +1,7 @@
 OC_CI_CORE = "owncloudci/core"
 OC_CI_NODEJS = "owncloudci/nodejs:16"
 OC_CI_PHP = "owncloudci/php:7.4"
-OC_UBUNTU = "owncloud/ubuntu:16.04"
+OC_UBUNTU = "owncloud/ubuntu:20.04"
 DOCKER_PLUGIN = "plugins/docker:18.09"
 
 config = {
