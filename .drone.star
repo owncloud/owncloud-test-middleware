@@ -39,51 +39,51 @@ def main(ctx):
 def integrationTests():
     pipelines = []
 
-if not config["integrationTests"]:
+    if not config["integrationTests"]:
+        return pipelines
+    for category, matrix in config["integrationTests"].items():
+        if category == "suites":
+            i = 1
+            for suite in matrix:
+                db = config["integrationTests"]["database"]
+
+                steps = installDependencies()
+                steps += installCore(db) + owncloudLog()
+                steps += setupServer(suite["name"], suite["testingAppRequired"])
+                steps += fixPermissions()
+                steps += [{
+                    "name": suite["name"],
+                    "image": OC_CI_NODEJS,
+                    "environment": {
+                        "CORE_PATH": "/var/www/owncloud/server",
+                        "BACKEND_HOST": "http://owncloud",
+                    },
+                    "commands": [
+                        suite["command"],
+                    ],
+                }]
+
+                pipelines.append({
+                    "kind": "pipeline",
+                    "type": "docker",
+                    "name": "integration-tests-{}".format(i),
+                    "workspace": {
+                        "base": "/var/www/owncloud",
+                        "path": config["app"],
+                    },
+                    "steps": steps,
+                    "services": mysqlDbService(db) + owncloudService(),
+                    "volumes": [{
+                        "name": "uploads",
+                        "temp": {},
+                    }, {
+                        "name": "configs",
+                        "temp": {},
+                    }],
+                    "trigger": trigger,
+                })
+                i = i + 1
     return pipelines
-for category, matrix in config["integrationTests"].items():
-    if category == "suites":
-        i = 1
-for suite in matrix:
-    db = config["integrationTests"]["database"]
-
-steps = installDependencies()
-steps += installCore(db) + owncloudLog()
-steps += setupServer(suite["name"], suite["testingAppRequired"])
-steps += fixPermissions()
-steps += [{
-    "name": suite["name"],
-    "image": OC_CI_NODEJS,
-    "environment": {
-        "CORE_PATH": "/var/www/owncloud/server",
-        "BACKEND_HOST": "http://owncloud",
-    },
-    "commands": [
-        suite["command"],
-    ],
-}]
-
-pipelines.append({
-    "kind": "pipeline",
-    "type": "docker",
-    "name": "integration-tests-{}".format(i),
-    "workspace": {
-        "base": "/var/www/owncloud",
-        "path": config["app"],
-    },
-    "steps": steps,
-    "services": mysqlDbService(db) + owncloudService(),
-    "volumes": [{
-        "name": "uploads",
-        "temp": {},
-    }, {
-        "name": "configs",
-        "temp": {},
-    }],
-    "trigger": trigger,
-})
-i = i + 1
-return pipelines
 
 def owncloudService():
     return [{
@@ -136,16 +136,16 @@ def getDbName(db):
 def mysqlDbService(db):
     dbName = getDbName(db)
 
-return [{
-    "name": dbName,
-    "image": db,
-    "environment": {
-        "MYSQL_USER": "owncloud",
-        "MYSQL_PASSWORD": "owncloud",
-        "MYSQL_DATABASE": "owncloud",
-        "MYSQL_ROOT_PASSWORD": "owncloud",
-    },
-}]
+    return [{
+        "name": dbName,
+        "image": db,
+        "environment": {
+            "MYSQL_USER": "owncloud",
+            "MYSQL_PASSWORD": "owncloud",
+            "MYSQL_DATABASE": "owncloud",
+            "MYSQL_ROOT_PASSWORD": "owncloud",
+        },
+    }]
 
 def installCore(db):
     host = getDbName(db)
@@ -236,7 +236,7 @@ def docker(ctx):
         },
     }
 
-return [result]
+    return [result]
 
 def buildDockerImage():
     return [{
