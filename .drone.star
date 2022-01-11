@@ -106,7 +106,7 @@ def installDependencies():
         "name": "yarn-install",
         "image": OC_CI_NODEJS,
         "commands": [
-            "yarn install",
+            "yarn install --immutable",
         ],
     }]
 
