@@ -1,7 +1,7 @@
 {
   "name": "middleware",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "A test middleware for owncloud clients",
   "main": "index.js",
   "keywords": [],
   "author": "",
