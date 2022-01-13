@@ -1,5 +1,4 @@
 const httpHelper = require('./httpHelper')
-const { normalize } = require('./path')
 const codify = require('../helpers/codify')
 const assert = require('assert')
 const { client } = require('../config.js')
