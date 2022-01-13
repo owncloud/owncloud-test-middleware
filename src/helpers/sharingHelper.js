@@ -291,29 +291,47 @@ module.exports = {
    * @param {string} sharer
    */
   declineShare: async function (filename, user, sharer) {
+    /** [OCIS] https://github.com/owncloud/ocis/issues/1231
+     * In ocis, when a resource inside a folder is shared, the share details contains
+     * only the resource in the path and not the containing folder
+     *  eg: if "simple-folder/subfolder" has been shared, the share details is shown
+     *  as path: "/subfolder"
+     */
+    const splitted = filename.split('/')
+    filename = splitted[splitted.length - 1]
     const allShares = await this.getAllSharesSharedWithUser(user)
     const elementsToDecline = allShares.filter((element) => {
+      const splitPath = element.path.split('/')
+      const resourceAtEndOfPath = splitPath[splitPath.length - 1]
       return (
-        element.state === this.SHARE_STATE.pending &&
-        normalize(element.path) === filename &&
-        element.uid_owner === sharer
+          element.state === this.SHARE_STATE.pending &&
+          resourceAtEndOfPath === filename &&
+          element.uid_owner === sharer
       )
     })
+    let errorString = ''
     if (elementsToDecline.length < 1) {
-      throw new Error('Could not find the share to be declined')
+      for (const element of allShares) {
+        errorString = errorString + ' ' + element.path
+      }
+      throw new Error('Could not find the share to be declined' + errorString)
     }
+    /**
+     * TODO: loop only run once because the return
+     * needs tests and further debugging why it's this way
+     */
     for (const element of elementsToDecline) {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
       return httpHelper
-        .deleteOCS(apiURL, user)
-        .then((res) => {
-          res = httpHelper.checkStatus(res, 'The response status is not the expected value')
-          return res.json()
-        })
-        .then((res) => {
-          httpHelper.checkOCSStatus(res, 'Could not perform the decline action')
-        })
+          .deleteOCS(apiURL, user)
+          .then((res) => {
+            res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+            return res.json()
+          })
+          .then((res) => {
+            httpHelper.checkOCSStatus(res, 'Could not perform the decline action')
+          })
     }
   },
 
@@ -326,41 +344,45 @@ module.exports = {
    * @param {string} sharer
    */
   acceptShare: async function (filename, user, sharer) {
+    /** [OCIS] https://github.com/owncloud/ocis/issues/1231
+     * In ocis, when a resource inside a folder is shared, the share details contains
+     * only the resource in the path and not the containing folder
+     *  eg: if "simple-folder/subfolder" has been shared, the share details is shown
+     *  as path: "/subfolder"
+     *
+     * We always check just for the last part of the path.
+     */
+    const splitted = filename.split('/')
+    filename = splitted[splitted.length - 1]
     const allShares = await this.getAllSharesSharedWithUser(user)
     const elementsToAccept = allShares.filter((element) => {
+      const splitPath = element.path.split('/')
+      const resourceAtEndOfPath = splitPath[splitPath.length - 1]
       return (
-        element.state === this.SHARE_STATE.pending &&
-        element.path.slice(1) === filename &&
-        element.uid_owner === sharer
+          element.state === this.SHARE_STATE.pending &&
+          resourceAtEndOfPath === filename &&
+          element.uid_owner === sharer
       )
     })
+    let errorString = ''
     if (elementsToAccept.length < 1) {
-      throw new Error('Could not find the share to be accepted')
+      for (const element of allShares) {
+        errorString = errorString + ' ' + element.path
+      }
+      throw new Error('Could not find the share to be accepted:' + errorString)
     }
+    /**
+     * TODO: loop only run once because the return
+     * needs tests and further debugging why it's this way
+     */
     for (const element of elementsToAccept) {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
-      return httpHelper
-        .postOCS(apiURL, user)
-        .then((res) => {
-          res = httpHelper.checkStatus(res, 'The response status is not the expected value')
-          if (client.globals.ocis) return res.text()
-          return res.json()
-        })
-        .then((res) => {
-          if (client.globals.ocis) {
-            if (res !== '') {
-              throw new Error(`
-              This is a good error, seems like a bug in ocis has been fixed,
-              just fire up your text editor and remove this line,
-              dont forget to keep your fingers crossed in the meantime.
-              More on https://github.com/owncloud/product/issues/207
-            `)
-            }
-            return
-          }
-          httpHelper.checkOCSStatus(res, 'Could not perform the accept action')
-        })
+      return httpHelper.postOCS(apiURL, user).then((res) => {
+        res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+        if (client.globals.ocis) return res.text()
+        return res.json()
+      })
     }
   },
 
