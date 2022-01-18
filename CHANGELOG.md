@@ -1,3 +1,15 @@
+## Changelog for [1.2.0] (2022-01-18)
+
+The following sections list the changes for 1.2.0
+
+[1.2.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.1.0...v1.2.0
+
+### Summary
+
+- Fix getTrashBinElements function [#85](https://github.com/owncloud/owncloud-test-middleware/pull/85)
+- Refactor acceptShare and declineShare function to work on Ocis [#86](https://github.com/owncloud/owncloud-test-middleware/pull/86)
+
+
 ## Changelog for [1.1.0] (2022-01-11)
 
 The following sections list the changes for 1.1.0
