@@ -6,7 +6,7 @@ const stepDefPatternData = [
     {
       stepDef: {
         token: 'invalid',
-        pattern: 'doesnot matters',
+        pattern: 'does not matter',
       },
       errMessage: 'Invalid token type',
     },
@@ -16,7 +16,7 @@ const stepDefPatternData = [
     {
       stepDef: {
         token: 54,
-        pattern: 'doesnot matters',
+        pattern: 'does not matter',
       },
       errMessage: 'Invalid token type',
     },
@@ -26,7 +26,7 @@ const stepDefPatternData = [
     {
       stepDef: {
         token: true,
-        pattern: 'doesnot matters',
+        pattern: 'does not matter',
       },
       errMessage: 'Invalid token type',
     },
@@ -135,10 +135,10 @@ describe('Checking stepDef generated patterns', () => {
       expect(stepDef.getPatterns()).toStrictEqual(data.patterns)
     } else {
       try {
-        const stepDef = new StepDef(data.stepDef.token, data.stepDef.pattern, () => {
+        new StepDef(data.stepDef.token, data.stepDef.pattern, () => {
           return 0
         })
-        throw new Error('creating invalid stepdef should fail but it passed', stepDef)
+        throw new Error('creating invalid stepdef should fail but it passed')
       } catch (err) {
         expect(err.message).toBe(data.errMessage)
       }
@@ -360,7 +360,7 @@ describe('Checking stepDef.getRegexMatches', () => {
       return 0
     })
     const step = new Step('GIVEN', data.step)
-    matches = stepDef.getRegexMatches(step)
+    const matches = stepDef.getRegexMatches(step)
     expect(matches).toStrictEqual(data.matches)
   })
 })

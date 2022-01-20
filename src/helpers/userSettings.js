@@ -130,7 +130,7 @@ module.exports = {
   },
   /**
    *
-   * @param {string} userId
+   * @param {string} groupId
    */
   deleteGroupFromCreatedGroupsList: function (groupId) {
     this.createdGroups = this.createdGroups.filter((item) => item !== groupId)

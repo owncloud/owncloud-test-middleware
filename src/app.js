@@ -147,7 +147,7 @@ app.use('/state', (req, res) => {
     return res.writeHead(405).end()
   }
   if (!initialized) {
-    log.error('Failed to get the state: Middleware is not yet initiialized')
+    log.error('Failed to get the state: Middleware is not yet initialized')
     return res
       .status(403)
       .json({

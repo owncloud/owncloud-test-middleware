@@ -72,7 +72,7 @@ async function getConfigs() {
   const resp = await occHelper.runOcc(['config:list'])
   let stdOut = _.get(resp, 'ocs.data.stdOut')
   if (stdOut === undefined) {
-    throw new Error('stdOut notFound, Found:', resp)
+    throw new Error('stdOut notFound')
   }
   stdOut = JSON.parse(stdOut)
   return stdOut
