@@ -26,8 +26,8 @@ exports.getCurrentBackendUrl = function () {
  * @param {...*} args - the arguments to pass to the function
  *
  * @example using multiple functions concurrently by using closures
- * runOnRemoteBackend(() => Promise.all([...list_of_promises]);
- * // probably, we need a async-mutex here :evil_laugh:
+ * runOnRemoteBackend(() => Promise.all([...list_of_promises]));
+ * // probably, we need an async-mutex here :evil_laugh:
  *
  * @example
  * runOnRemoteBackend(doSomething, arg1, arg2); // if you don't want unnecessary closures

@@ -142,7 +142,7 @@ exports.getTrashBinElements = function (user, depth = 'infinity') {
           try {
             let trashData = convert.xml2js(str, { compact: true })['d:multistatus']['d:response']
             const trashItems = []
-            // 'trashData' gets object instead of array when there are no any files/folders in the trashbin
+            // 'trashData' gets object instead of array when there are not any files/folders in the trashbin
             // so trashData.map() will cause error if trashData gets object
             // following wraps the object in array
             if (!Array.isArray(trashData)) {

@@ -36,7 +36,7 @@ module.exports = {
     humanReadablePermissions = humanReadablePermissions.map(function (s) {
       return String.prototype.trim.apply(s)
     })
-    for (var i = 0; i < humanReadablePermissions.length; i++) {
+    for (let i = 0; i < humanReadablePermissions.length; i++) {
       if (humanReadablePermissions[i] in this.PERMISSION_TYPES) {
         permissionBitMask = permissionBitMask + this.PERMISSION_TYPES[humanReadablePermissions[i]]
       } else {
@@ -46,7 +46,7 @@ module.exports = {
     return permissionBitMask
   },
   /**
-   * converts the human readable share-type string to the API number as defined in https://doc.owncloud.com/server/10.0/developer_manual/core/ocs-share-api.html#create-a-new-share
+   * converts the human-readable share-type string to the API number as defined in https://doc.owncloud.com/server/10.0/developer_manual/core/ocs-share-api.html#create-a-new-share
    * @param {string} shareTypeString
    * @returns {number}
    */
@@ -217,7 +217,7 @@ module.exports = {
   /**
    * get a list of all public link shares shared by provided sharer
    *
-   * @param sharer user whose all public links are to be fetched
+   * @param sharer user whose public links are to be fetched
    * @returns {Object<[]>}
    */
   getAllPublicLinkShares: async function (sharer) {
@@ -410,9 +410,7 @@ module.exports = {
    * Asynchronously accepts the shares in pending state and meeting the conditions
    *
    * @async
-   * @param {string} filename
    * @param {string} user
-   * @param {string} sharer
    */
   acceptLastPendingShare: async function (user) {
     const allShares = await this.getAllPendingFederatedShares(user)
@@ -462,12 +460,12 @@ module.exports = {
   /**
    * updates the shared file/folder permission by sharer
    *
-   * @param shauser
-   * @param resource
-   * @param permissionsreTypeString
-   * @param receiver
+   * @param {string} sharer
+   * @param {string} resource
+   * @param permissionsString string of permissions separated by comma. For valid permissions see this.PERMISSION_TYPES
+   * @param {string} receiver
    */
-  updateSharedFilePermissionByUser: async function (sharer, resource, permissions, receiver) {
+  updateSharedFilePermissionByUser: async function (sharer, resource, permissionsString, receiver) {
     let shareID
     const shares = await this.getAllSharesSharedByUser(sharer)
     for (const shareElement of shares) {
@@ -485,7 +483,7 @@ module.exports = {
     }
     const apiURL = `apps/files_sharing/api/v1/shares/${shareID}`
     const body = new URLSearchParams()
-    const updatedPermissions = this.humanReadablePermissionsToBitmask(permissions)
+    const updatedPermissions = this.humanReadablePermissionsToBitmask(permissionsString)
     body.append('permissions', updatedPermissions)
     return httpHelper.putOCS(apiURL, sharer, body).then((res) => {
       httpHelper.checkStatus(res, `Could not find ${resource} in shares, shared by ${sharer}`)

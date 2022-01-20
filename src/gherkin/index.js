@@ -76,10 +76,7 @@ class StepDef {
     if (step.table) {
       datalen += 1
     }
-    if (datalen !== this.action.length) {
-      return false
-    }
-    return true
+    return datalen === this.action.length
   }
 
   match(step) {
@@ -98,10 +95,7 @@ class StepDef {
         datalen += 1
       }
 
-      if (datalen !== this.action.length) {
-        return false
-      }
-      return true
+      return datalen === this.action.length
     }
     return false
   }
@@ -205,8 +199,8 @@ class Step {
 }
 
 function verifyMatchParams(pattern) {
-  var reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g) // eslint-disable-line no-useless-escape
-  var data = []
+  const reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g) // eslint-disable-line no-useless-escape
+  const data = []
   let found = pattern.match(reg)
 
   if (!found) {
