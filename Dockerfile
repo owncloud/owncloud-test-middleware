@@ -7,9 +7,11 @@ COPY yarn.lock ./
 COPY data ./data
 COPY src ./src
 COPY filesForUpload ./filesForUpload
+COPY dev/entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
 RUN yarn
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD [ "sh", "-c", "/entrypoint.sh" ]
