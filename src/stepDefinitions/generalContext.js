@@ -1,55 +1,9 @@
 const { client } = require('../config.js')
-const { After, Given, Then } = require('../context')
-const webdavHelper = require('../helpers/webdavHelper')
+const { After, Given } = require('../context')
 const httpHelper = require('../helpers/httpHelper')
 const backendHelper = require('../helpers/backendHelper')
-const assert = require('assert')
-const fs = require('fs')
-const path = require('path')
 const occHelper = require('../helpers/occHelper')
 const codify = require('../helpers/codify')
-
-const createdFiles = []
-
-Then(
-  'as {string} the content of {string} should be the same as the content of local file {string}',
-  async function(userId, remoteFile, localFile) {
-    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, localFile)
-    const body = await webdavHelper.download(userId, remoteFile)
-
-    assertContentOfLocalFileIs(fullPathOfLocalFile, body)
-
-    return this
-  }
-)
-
-Then(
-  'as {string} the content of {string} should not be the same as the content of local file {string}',
-  async function(userId, remoteFile, localFile) {
-    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, localFile)
-    const body = await webdavHelper.download(userId, remoteFile)
-
-    assertContentOfLocalFileIsNot(fullPathOfLocalFile, body)
-  }
-)
-
-const assertContentOfLocalFileIs = function(fullPathOfLocalFile, actualContent) {
-  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
-  return assert.strictEqual(
-    actualContent,
-    expectedContent,
-    'asserting content of local file "' + fullPathOfLocalFile + '"'
-  )
-}
-
-const assertContentOfLocalFileIsNot = function(fullPathOfLocalFile, actualContent) {
-  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
-  return assert.notStrictEqual(
-    actualContent,
-    expectedContent,
-    'asserting content of local file "' + fullPathOfLocalFile + '"'
-  )
-}
 
 
 Given('the setting {string} of app {string} has been set to {string}', function(
@@ -120,14 +74,6 @@ After(async function(testCase) {
   body.append('global', 'true')
   const url = 'apps/testing/api/v1/lockprovisioning'
   await httpHelper.deleteOCS(url, 'admin', body)
-
-  createdFiles.forEach((fileName) => {
-    try {
-      fs.unlinkSync(fileName)
-    } catch (err) {
-      console.info(err.message)
-    }
-  })
 })
 
 // Tag support
@@ -154,14 +100,3 @@ Given('default expiration date for users is set to {int} day/days', function(day
 
   return this
 })
-
-Given(
-  'a file with the size of {string} bytes and the name {string} has been created locally',
-  function (size, name) {
-    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, name)
-    const fh = fs.openSync(fullPathOfLocalFile, 'w')
-    fs.writeSync(fh, 'A', Math.max(0, size - 1))
-    fs.closeSync(fh)
-    createdFiles.push(fullPathOfLocalFile)
-  }
-)

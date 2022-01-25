@@ -1,14 +1,34 @@
-/* eslint-disable no-unused-expressions */
 const assert = require('assert')
-const { Given, Then } = require('../context')
+const fs = require('fs')
+
+const { Given, Then, After } = require('../context')
 const webdav = require('../helpers/webdavHelper')
 const backendHelper = require('../helpers/backendHelper')
 const { move } = require('../helpers/webdavHelper')
 const path = require('../helpers/path')
 const { download } = require('../helpers/webdavHelper')
-const fs = require('fs')
-
 const { client } = require('../config.js')
+const webdavHelper = require("../helpers/webdavHelper")
+
+const createdFiles = []
+const createdFolders = []
+
+After(() => {
+  createdFiles.forEach((fileName) => {
+    try {
+      fs.unlinkSync(fileName)
+    } catch (err) {
+      console.info(err.message)
+    }
+  })
+  createdFolders.forEach((folderPath) => {
+    try {
+      fs.rmSync(folderPath, { recursive: true, force: true })
+    } catch (err) {
+      console.info(err.message)
+    }
+  })
+})
 
 Given('user {string} has uploaded file with content {string} to {string}', async function(
   user,
@@ -55,6 +75,99 @@ Given('the following files/folders/resources have been deleted by user {string}'
   }
   return client
 })
+
+Given(
+  'a file with the size of {string} bytes and the name {string} has been created locally',
+  function (size, name) {
+    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, name)
+    const fh = fs.openSync(fullPathOfLocalFile, 'w')
+    fs.writeSync(fh, 'A', Math.max(0, size - 1))
+    fs.closeSync(fh)
+    createdFiles.push(fullPathOfLocalFile)
+  }
+)
+
+Given('a folder {string} has been created with the following files in separate sub-folders', function(folderName, filesTable) {
+  const files = filesTable.raw().map((item) => item[0])
+  const filesForUpload = client.globals.filesForUpload
+  const folderPath = path.join(filesForUpload, folderName)
+
+  if (new Set(files).size !== files.length) {
+    throw new Error(
+      `Allowing upload of multiple files in the same folder would complicate
+      other step-definitions. Please remove duplicated files and retry.`
+    )
+  }
+  if (files.length === 1) {
+    throw new Error(
+      'Please try uploading more than one file. Uploading only one file is not supported.'
+    )
+  }
+
+  fs.access(folderPath, (error) => {
+    if (!error) {
+      // if the folder already exists
+      fs.rmSync(folderPath, { recursive: true, force: true })
+    }
+    fs.mkdir(folderPath, { recursive: true }, (err) => {
+      if (err) throw err
+      else {
+        createdFolders.push(folderPath)
+        // copy files provided in table to the folder just created
+        files.forEach(file => {
+          fs.copyFile(
+            path.join(filesForUpload, file),
+            path.join(folderPath, file),
+            (err) => {
+              if (err) throw err
+            }
+          )
+        })
+      }
+    })
+  })
+})
+
+Then(
+  'as {string} the content of {string} should be the same as the content of local file {string}',
+  async function(userId, remoteFile, localFile) {
+    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, localFile)
+    const body = await webdavHelper.download(userId, remoteFile)
+
+    assertContentOfLocalFileIs(fullPathOfLocalFile, body)
+
+    return this
+  }
+)
+
+Then(
+  'as {string} the content of {string} should not be the same as the content of local file {string}',
+  async function(userId, remoteFile, localFile) {
+    const fullPathOfLocalFile = path.join(client.globals.filesForUpload, localFile)
+    const body = await webdavHelper.download(userId, remoteFile)
+
+    assertContentOfLocalFileIsNot(fullPathOfLocalFile, body)
+  }
+)
+
+const assertContentOfLocalFileIs = function(fullPathOfLocalFile, actualContent) {
+  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
+  return assert.strictEqual(
+    actualContent,
+    expectedContent,
+    'asserting content of local file "' + fullPathOfLocalFile + '"'
+  )
+}
+
+const assertContentOfLocalFileIsNot = function(fullPathOfLocalFile, actualContent) {
+  const expectedContent = fs.readFileSync(fullPathOfLocalFile, { encoding: 'utf-8' })
+  return assert.notStrictEqual(
+    actualContent,
+    expectedContent,
+    'asserting content of local file "' + fullPathOfLocalFile + '"'
+  )
+}
+
 
 Then('as user {string} file/folder {string} should be marked as favorite', async function(
   userId,
