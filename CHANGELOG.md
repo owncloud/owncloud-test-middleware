@@ -1,3 +1,15 @@
+## Changelog for [1.3.0] (2022-01-25)
+
+The following sections list the changes for 1.2.0
+
+[1.3.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.2.0...v1.3.0
+
+### Summary
+- Used entrypoint to start the middleware (docker) [#93](https://github.com/owncloud/owncloud-test-middleware/pull/93)
+- Added given step to create folder with files by [#92](https://github.com/owncloud/owncloud-test-middleware/pull/92)
+- Retry download if resource is locked [#90](https://github.com/owncloud/owncloud-test-middleware/pull/90)
+- Tidy some code [#89](https://github.com/owncloud/owncloud-test-middleware/pull/89)
+
 ## Changelog for [1.2.0] (2022-01-18)
 
 The following sections list the changes for 1.2.0
