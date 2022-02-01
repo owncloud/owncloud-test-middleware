@@ -87,45 +87,41 @@ Given(
   }
 )
 
-Given('a folder {string} has been created with the following files in separate sub-folders', function(folderName, filesTable) {
-  const files = filesTable.raw().map((item) => item[0])
+Given('a folder {string} has been created with the following files in separate sub-folders', async function(folderName, filesTable) {
   const filesForUpload = client.globals.filesForUpload
   const folderPath = path.join(filesForUpload, folderName)
 
-  if (new Set(files).size !== files.length) {
-    throw new Error(
-      `Allowing upload of multiple files in the same folder would complicate
-      other step-definitions. Please remove duplicated files and retry.`
-    )
+  function createFolder(path) {
+    return fs.mkdirSync(path, { recursive: true })
   }
-  if (files.length === 1) {
-    throw new Error(
-      'Please try uploading more than one file. Uploading only one file is not supported.'
-    )
+  try {
+    await fs.accessSync(folderPath, fs.constants.F_OK)
+    await fs.rmSync(folderPath, { recursive: true, force: true })
+    createFolder(folderPath)
+  } catch (err) {
+    // folder does not exist so create new one
+    createFolder(folderPath)
   }
 
-  fs.access(folderPath, (error) => {
-    if (!error) {
-      // if the folder already exists
-      fs.rmSync(folderPath, { recursive: true, force: true })
-    }
-    fs.mkdir(folderPath, { recursive: true }, (err) => {
-      if (err) throw err
-      else {
-        createdFolders.push(folderPath)
-        // copy files provided in table to the folder just created
-        files.forEach(file => {
-          fs.copyFile(
-            path.join(filesForUpload, file),
-            path.join(folderPath, file),
-            (err) => {
-              if (err) throw err
-            }
-          )
-        })
+  for (const tableRow of filesTable.hashes()) {
+    const subFolderPath = path.join(folderPath, tableRow.subFolder)
+    try {
+      await fs.accessSync(subFolderPath, fs.constants.F_OK)
+    } catch (err) {
+      // folder does not exist so create new one
+      createFolder(subFolderPath)
+    } finally {
+      if (tableRow.file) {
+        fs.copyFileSync(
+          path.join(filesForUpload, tableRow.file),
+          path.join(subFolderPath, tableRow.file)
+        )
       }
-    })
-  })
+    }
+  }
+  // only the upper folder is enough to remember
+  // every file/folder within will be removed in the after scene
+  createdFolders.push(folderPath)
 })
 
 Then(
