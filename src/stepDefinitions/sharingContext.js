@@ -6,13 +6,14 @@ require('url-search-params-polyfill')
 const httpHelper = require('../helpers/httpHelper')
 const backendHelper = require('../helpers/backendHelper')
 const sharingHelper = require('../helpers/sharingHelper')
-const { SHARE_TYPES } = require('../helpers/sharingHelper')
 const { runOcc } = require('../helpers/occHelper')
 const _ = require('lodash')
 const path = require('../helpers/path')
 const util = require('util')
 
 let timeOfLastShareOperation = Date.now()
+
+const SHARE_TYPES = sharingHelper.SHARE_TYPES
 
 Given(
   'user {string} from remote server has shared {string} with user {string} from local server',
