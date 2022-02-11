@@ -1,5 +1,6 @@
 const assert = require('assert')
 const fs = require('fs')
+const convert = require('xml-js')
 
 const { Given, Then, After } = require('../context')
 const backendHelper = require('../helpers/backendHelper')
@@ -270,3 +271,21 @@ Given(/^user "([^"]*)" has created folder "(.+)"$/, function(userId, folderName)
   folderName = folderName.replaceAll("\\", "")
   return webdavHelper.createFolder(userId, folderName)
 })
+
+Then(
+  'as user {string} folder {string} should contain {string} items',
+  async function (userName, folderName, itemsCount) {
+    const davPath = webdavHelper.createDavPath(userName, folderName)
+    const xmlResponse = await webdavHelper.propfind(davPath, userName, [])
+    const resObj = convert.xml2js(xmlResponse, { compact: true })
+    // 'd:response' contains entry for requested folder too
+    // so we need to subtract 1 to get the acutal items count
+    const actualCount = resObj['d:multistatus']['d:response'].length - 1
+    itemsCount = parseInt(itemsCount)
+    return assert.strictEqual(
+      actualCount,
+      itemsCount,
+      `Expected '${itemsCount}' items inside the folder '${folderName}' but got '${actualCount}'`
+    )
+  }
+)
