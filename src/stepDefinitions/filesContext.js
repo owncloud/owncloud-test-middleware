@@ -279,7 +279,7 @@ Then(
     const xmlResponse = await webdavHelper.propfind(davPath, userName, [])
     const resObj = convert.xml2js(xmlResponse, { compact: true })
     // 'd:response' contains entry for requested folder too
-    // so we need to subtract 1 to get the acutal items count
+    // so we need to subtract 1 to get the actual items count
     const actualCount = resObj['d:multistatus']['d:response'].length - 1
     itemsCount = parseInt(itemsCount)
     return assert.strictEqual(
