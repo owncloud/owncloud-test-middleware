@@ -1,3 +1,15 @@
+## Changelog for [1.4.0] (2022-02-16)
+
+The following sections list the changes for 1.4.0
+
+[1.4.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.3.0...v1.4.0
+
+### Summary
+- Fix local file create step by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/98
+- Fixed duplicated imports by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/99
+- added steps to check items count inside a folder by @sushmita56 in https://github.com/owncloud/owncloud-test-middleware/pull/100
+- Fix typo of 'actual' by @phil-davis in https://github.com/owncloud/owncloud-test-middleware/pull/102
+
 ## Changelog for [1.3.0] (2022-01-25)
 
 The following sections list the changes for 1.2.0
