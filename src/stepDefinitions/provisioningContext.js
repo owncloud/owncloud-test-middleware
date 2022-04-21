@@ -124,12 +124,12 @@ async function createUserWithAttributes(
 
 function deleteUser(userId) {
   userSettings.deleteUserFromCreatedUsersList(userId)
-  const url = `cloud/users/${userId}`
+  const url = encodeURI(`cloud/users/${userId}`)
   return httpHelper.deleteOCS(url)
 }
 
 function initUser(userId) {
-  const url = `cloud/users/${userId}`
+  const url = encodeURI(`cloud/users/${userId}`)
   return httpHelper.getOCS(url, userId)
 }
 
@@ -140,7 +140,7 @@ function editUser(userId, key, value) {
   value = encodeURI(value)
   const body = `key=${key}&value=${value}`
 
-  const url = `cloud/users/${userId}`
+  const url = encodeURI(`cloud/users/${userId}`)
   return httpHelper.putOCS(url, userId, body, headers)
 }
 
@@ -171,7 +171,7 @@ function createGroup(groupId) {
  */
 function deleteGroup(groupId) {
   userSettings.deleteGroupFromCreatedGroupsList(groupId)
-  const url = `cloud/groups/${groupId}`
+  const url = encodeURI(`cloud/groups/${groupId}`)
   return httpHelper.deleteOCS(url)
 }
 
@@ -181,12 +181,12 @@ function addToGroup(userId, groupId) {
   }
   const body = new URLSearchParams()
   body.append('groupid', groupId)
-  const url = `cloud/users/${userId}/groups`
+  const url = encodeURI(`cloud/users/${userId}/groups`)
   return httpHelper.postOCS(url, 'admin', body)
 }
 
 function blockUser(userId) {
-  const apiURL = `cloud/users/${userId}/disable`
+  const apiURL = encodeURI(`cloud/users/${userId}/disable`)
   return httpHelper.putOCS(apiURL, 'admin')
 }
 
@@ -230,7 +230,7 @@ Given('the quota of user {string} has been set to {string}', function(userId, qu
   const body = new URLSearchParams()
   body.append('key', 'quota')
   body.append('value', quota)
-  const url = `cloud/users/${userId}`
+  const url = encodeURI(`cloud/users/${userId}`)
   return httpHelper
     .putOCS(url, 'admin', body)
     .then(res => httpHelper.checkStatus(res, 'Could not set quota.'))
