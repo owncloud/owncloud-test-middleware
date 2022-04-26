@@ -18,8 +18,9 @@ class StepDef {
       throw new Error('Invalid token type')
     }
     pattern = pattern.toString()
-    this.type =
-      pattern.startsWith('/') && pattern.endsWith('/') ? patternTypes.REGEX : patternTypes.REGULAR
+    this.type = pattern.startsWith('/') && pattern.endsWith('/')
+        ? patternTypes.REGEX
+        : patternTypes.REGULAR
     this.token = token
     this.pattern = pattern
     this.action = action

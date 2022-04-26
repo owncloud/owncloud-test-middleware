@@ -244,10 +244,10 @@ exports.getProperties = function (path, userId, requestedProps) {
       const response = JSON.parse(convert.xml2json(str, { compact: true }))
       const receivedProps = _.get(
         response,
-        '[\'d:multistatus\'][\'d:response\'][\'d:propstat\'][\'d:prop\']'
+        '["d:multistatus"]["d:response"]["d:propstat"]["d:prop"]'
       )
       if (receivedProps === undefined) {
-        const errMsg = 'Could not find \'d:prop\' inside response. Received:\n'
+        const errMsg = 'Could not find "d:prop" inside response. Received:\n'
         return reject(new Error(errMsg + JSON.stringify(str)))
       }
       const properties = {}

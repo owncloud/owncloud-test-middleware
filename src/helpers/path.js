@@ -5,7 +5,6 @@ const assert = require('assert')
 const normalize = _.replace(/^\/+|$/g, '')
 const parts = _.pipe(normalize, _.split('/'))
 
-
 const relativeTo = function (basePath, childPath) {
   basePath = normalize(basePath)
   childPath = normalize(childPath)
