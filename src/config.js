@@ -4,6 +4,7 @@ const withHttp = (url) => (/^https?:\/\//i.test(url) ? url : `http://${url}`)
 
 const RUN_WITH_LDAP = !!process.env.RUN_WITH_LDAP
 const RUN_ON_OCIS = process.env.RUN_ON_OCIS === 'true'
+const RUN_WITH_IDM = process.env.RUN_WITH_IDM === 'true'
 
 const LOCAL_BACKEND_URL = withHttp(
   process.env.BACKEND_HOST || (RUN_ON_OCIS ? 'https://localhost:9200' : 'http://localhost:8080')
@@ -43,6 +44,7 @@ const config = {
     ldap_base_dn: LDAP_BASE_DN,
     testing_data_dir: TESTING_DATA_DIR,
     ldap_password: LDAP_ADMIN_PASSWORD,
+    idm: RUN_WITH_IDM,
   },
   assert,
 }
