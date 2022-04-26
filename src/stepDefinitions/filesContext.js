@@ -8,7 +8,7 @@ const { move } = require('../helpers/webdavHelper')
 const path = require('../helpers/path')
 const { download } = require('../helpers/webdavHelper')
 const { client } = require('../config.js')
-const webdavHelper = require("../helpers/webdavHelper")
+const webdavHelper = require('../helpers/webdavHelper')
 
 const createdFiles = []
 const createdFolders = []
@@ -259,7 +259,7 @@ Given('user {string} has locked file/folder {string} setting the following prope
 Given(/^user "([^"]*)" has created file "(.+)"$/, function(userId, fileName) {
   // the captured regex won't filter the backslash present in steps with folder name "file with \"nested\" quote"
   // so we need to replace it and send it as `file with "nested" quote`
-  fileName = fileName.replaceAll("\\", "")
+  fileName = fileName.replaceAll('\\', '')
   return webdavHelper.createFile(userId, fileName, '')
 })
 
@@ -268,7 +268,7 @@ Given(/^user "([^"]*)" has created file "(.+)"$/, function(userId, fileName) {
 Given(/^user "([^"]*)" has created folder "(.+)"$/, function(userId, folderName) {
   // the captured regex won't filter the backslash present in steps with folder name "folder with \"nested\" quote"
   // so we need to replace it and send it as `folder with "nested" quote`
-  folderName = folderName.replaceAll("\\", "")
+  folderName = folderName.replaceAll('\\', '')
   return webdavHelper.createFolder(userId, folderName)
 })
 

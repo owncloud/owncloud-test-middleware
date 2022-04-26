@@ -1,4 +1,3 @@
-/* eslint no-undef: 0, jest/no-try-expect: 0 */
 const { Step, TestContext, StepDef } = require('./index')
 
 const testContextData = [

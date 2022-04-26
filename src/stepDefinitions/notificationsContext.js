@@ -17,7 +17,7 @@ Given('user {string} is sent a notification', function(user) {
 Given('app {string} has been {string}', async function(app, action) {
   assert.ok(
     action === 'enabled' || action === 'disabled',
-    "only supported either 'enabled' or 'disabled'. Passed: " + action
+    'only supported either \'enabled\' or \'disabled\'. Passed: ' + action
   )
 
   if (client.globals.ocis) {

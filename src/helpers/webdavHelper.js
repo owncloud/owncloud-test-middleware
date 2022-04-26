@@ -100,12 +100,12 @@ exports.move = function (userId, fromName, toName) {
  * @param {string} path
  * @param {string} userId
  * @param {array} properties
- * @param {number} folderDepth
+ * @param {string} folderDepth
  */
 exports.propfind = function (path, userId, properties, folderDepth = '1') {
   const davPath = encodeURI(path)
   let propertyBody = ''
-  properties.map((prop) => {
+  properties.forEach((prop) => {
     propertyBody += `<${prop}/>`
   })
   const body = `<?xml version="1.0"?>
@@ -244,14 +244,14 @@ exports.getProperties = function (path, userId, requestedProps) {
       const response = JSON.parse(convert.xml2json(str, { compact: true }))
       const receivedProps = _.get(
         response,
-        "['d:multistatus']['d:response']['d:propstat']['d:prop']"
+        '[\'d:multistatus\'][\'d:response\'][\'d:propstat\'][\'d:prop\']'
       )
       if (receivedProps === undefined) {
-        const errMsg = "Could not find 'd:prop' inside response. Received:\n"
+        const errMsg = 'Could not find \'d:prop\' inside response. Received:\n'
         return reject(new Error(errMsg + JSON.stringify(str)))
       }
       const properties = {}
-      requestedProps.map((propertyName) => {
+      requestedProps.forEach((propertyName) => {
         properties[propertyName] = receivedProps[propertyName]._text
       })
       return resolve(properties)
@@ -287,7 +287,7 @@ exports.getFavouritedResources = function (user) {
     .then((res) => {
       const favData = convert.xml2js(res, { compact: true })['d:multistatus']['d:response']
       const favItems = []
-      favData.map((favourite) => {
+      favData.forEach((favourite) => {
         favItems.push({
           resource: filename(favourite['d:href']._text),
           isFolder: !(

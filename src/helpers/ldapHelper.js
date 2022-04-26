@@ -118,7 +118,7 @@ exports.createUser = async function (
       objectclass: ['posixAccount', 'inetOrgPerson'],
       homeDirectory: `/home/openldap/${user}`,
       userPassword: password,
-      displayName: displayName,
+      displayName,
       mail: email,
       gidNumber: 5000,
       uidNumber: uid,
