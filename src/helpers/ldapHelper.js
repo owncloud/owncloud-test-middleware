@@ -1,7 +1,7 @@
-const { client } = require('../config.js')
 const ldap = require('ldapjs')
-const { join } = require('./path')
 const fs = require('fs-extra')
+const { join } = require('./path')
+const { client } = require('../config.js')
 
 const userHelper = require('./userSettings')
 

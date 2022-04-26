@@ -1,5 +1,4 @@
 const app = require('./app.js')
-
 const { log } = require('./log.js')
 
 // Configuration

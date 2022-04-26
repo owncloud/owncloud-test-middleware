@@ -1,7 +1,7 @@
 /* eslint-disable jest/expect-expect */
+const assert = require('assert')
 const request = require('supertest')
 const app = require('../../src/app')
-const assert = require('assert')
 
 describe('middleware should be initialized to perform other actions', () => {
   it('execute endpoint does not work without initialization', (done) => {

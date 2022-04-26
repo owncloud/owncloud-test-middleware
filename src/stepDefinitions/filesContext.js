@@ -1,7 +1,6 @@
 const assert = require('assert')
 const fs = require('fs')
 const convert = require('xml-js')
-
 const { Given, Then, After } = require('../context')
 const backendHelper = require('../helpers/backendHelper')
 const { move } = require('../helpers/webdavHelper')

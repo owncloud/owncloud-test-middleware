@@ -1,8 +1,8 @@
+const _ = require('lodash')
+const pLimit = require('p-limit')
 const httpHelper = require('./httpHelper')
 const occHelper = require('./occHelper')
 const { difference } = require('./objects')
-const _ = require('lodash')
-const pLimit = require('p-limit')
 
 // run 10 promises at once at max
 const limit = pLimit(10)

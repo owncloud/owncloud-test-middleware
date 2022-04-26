@@ -1,7 +1,7 @@
-const userSettings = require('../helpers/userSettings')
 const _ = require('lodash')
 const fetch = require('node-fetch')
 const { join } = require('./path')
+const userSettings = require('../helpers/userSettings')
 const backendHelper = require('../helpers/backendHelper')
 
 /**

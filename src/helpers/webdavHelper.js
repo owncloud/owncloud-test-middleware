@@ -1,8 +1,8 @@
-const httpHelper = require('../helpers/httpHelper')
-const backendHelper = require('./backendHelper')
-const convert = require('xml-js')
 const _ = require('lodash/object')
+const convert = require('xml-js')
+const backendHelper = require('./backendHelper')
 const { normalize, join, filename } = require('../helpers/path')
+const httpHelper = require('../helpers/httpHelper')
 const occHelper = require('../helpers/occHelper')
 const testHelper = require('../helpers/testHelper')
 

@@ -1,8 +1,8 @@
+const assert = require('assert')
+const util = require('util')
 const { client } = require('../config.js')
 const { Given } = require('../context')
 const httpHelper = require('../helpers/httpHelper')
-const assert = require('assert')
-const util = require('util')
 
 Given('user {string} is sent a notification', function(user) {
   const body = new URLSearchParams()

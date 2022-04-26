@@ -1,12 +1,10 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-
 const { Step, Token, Table } = require('./gherkin/index.js')
 const { testContext } = require('./context/index.js')
-
 const { client } = require('./config.js')
-
 const { log } = require('./log.js')
+
 
 // Register new contexts here
 require('./setup.js')

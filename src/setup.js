@@ -1,7 +1,6 @@
 const { client } = require('./config.js')
 const { Before, After } = require('./context/index.js')
 const { rollbackConfigs, cacheConfigs } = require('./helpers/config.js')
-
 const ldap = require('./helpers/ldapHelper.js')
 
 Before(function createLdapClient() {

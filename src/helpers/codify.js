@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const { client } = require('../config.js')
-
 const { passwords } = require('./userSettings')
 
 /**
