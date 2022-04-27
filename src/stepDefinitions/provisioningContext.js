@@ -126,8 +126,12 @@ async function createUserWithAttributes(
 
 function deleteUser(userId) {
   userSettings.deleteUserFromCreatedUsersList(userId)
-  const url = encodeURI(`cloud/users/${userId}`)
-  return httpHelper.deleteOCS(url)
+  if (client.globals.idm) {
+    return graph.deleteUser(userId)
+  } else {
+    const url = encodeURI(`cloud/users/${userId}`)
+    return httpHelper.deleteOCS(url)
+  }
 }
 
 function initUser(userId) {
