@@ -26,10 +26,7 @@ app.use(bodyParser.json())
 // run cache
 let initialized
 
-app.use('/execute', async (req, res) => {
-  if (req.method !== 'POST') {
-    res.writeHead(405).end()
-  }
+app.post('/execute', async (req, res) => {
   if (!initialized) {
     return res
       .status(403)
@@ -43,8 +40,8 @@ app.use('/execute', async (req, res) => {
   if (!step) {
     return res.status(400).send('Step needs to be provided')
   }
-  let token = step.substr(0, step.indexOf(' '))
-  const pattern = step.substr(step.indexOf(' ') + 1)
+  let token = step.slice(0, step.indexOf(' '))
+  const pattern = step.slice(step.indexOf(' ') + 1)
 
   token = token.toUpperCase()
   if (!Object.keys(Token).includes(token)) {
@@ -79,10 +76,7 @@ app.use('/execute', async (req, res) => {
   }
 })
 
-app.use('/init', async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.writeHead(405).end()
-  }
+app.post('/init', async (req, res) => {
   try {
     if (!client.globals.ocis) {
       await runOcc(['app:list', 'testing'])
@@ -111,10 +105,7 @@ app.use('/init', async (req, res) => {
   }
 })
 
-app.use('/cleanup', async (req, res) => {
-  if (req.method !== 'POST') {
-    res.writeHead(405).end()
-  }
+app.post('/cleanup', async (req, res) => {
   if (!initialized) {
     log.error('Failed to run cleanup: Middleware is not yet initialized')
     return res
@@ -140,10 +131,7 @@ app.use('/cleanup', async (req, res) => {
   res.end()
 })
 
-app.use('/state', (req, res) => {
-  if (req.method !== 'GET') {
-    return res.writeHead(405).end()
-  }
+app.get('/state', (req, res) => {
   if (!initialized) {
     log.error('Failed to get the state: Middleware is not yet initialized')
     return res
