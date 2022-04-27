@@ -1,7 +1,7 @@
-const httpHelper = require('./httpHelper')
-const codify = require('../helpers/codify')
 const assert = require('assert')
+const httpHelper = require('./httpHelper')
 const { client } = require('../config.js')
+const codify = require('../helpers/codify')
 const path = require('../helpers/path')
 
 module.exports = {
@@ -319,6 +319,7 @@ module.exports = {
      * TODO: loop only run once because the return
      * needs tests and further debugging why it's this way
      */
+    // eslint-disable-next-line no-unreachable-loop
     for (const element of elementsToDecline) {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
@@ -374,6 +375,7 @@ module.exports = {
      * TODO: loop only run once because the return
      * needs tests and further debugging why it's this way
      */
+    // eslint-disable-next-line no-unreachable-loop
     for (const element of elementsToAccept) {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`

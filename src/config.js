@@ -1,4 +1,5 @@
 const path = require('path')
+
 const withHttp = (url) => (/^https?:\/\//i.test(url) ? url : `http://${url}`)
 
 const RUN_WITH_LDAP = !!process.env.RUN_WITH_LDAP

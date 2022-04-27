@@ -1,15 +1,15 @@
-const { client } = require('../config.js')
-const { When, Given, Then } = require('../context')
+require('url-search-params-polyfill')
+const _ = require('lodash')
+const util = require('util')
 const assert = require('assert')
 const { URLSearchParams } = require('url')
-require('url-search-params-polyfill')
+const { client } = require('../config.js')
+const { Given, When, Then } = require('../context')
 const httpHelper = require('../helpers/httpHelper')
 const backendHelper = require('../helpers/backendHelper')
 const sharingHelper = require('../helpers/sharingHelper')
 const { runOcc } = require('../helpers/occHelper')
-const _ = require('lodash')
 const path = require('../helpers/path')
-const util = require('util')
 
 let timeOfLastShareOperation = Date.now()
 
@@ -83,10 +83,10 @@ const updateTimeOfLastShareOperation = function() {
  *
  * @param {string} elementToShare  path of file/folder being shared
  * @param {string} sharer  username of the sharer
- * @param receiver  username of the receiver
- * @param shareType  Type of share 0 = user, 1 = group, 3 = public (link), 6 = federated (cloud share).
+ * @param {string|null} receiver  username of the receiver
+ * @param {number} shareType  Type of share 0 = user, 1 = group, 3 = public (link), 6 = federated (cloud share).
  * @param {string} permissionString  permissions of the share for valid permissions see sharingHelper.PERMISSION_TYPES
- * @param {string} name name of the link (for public links), default = "New Share"
+ * @param {string|null} name name of the link (for public links), default = "New Share"
  * @param {object} extraParams Extra parameters allowed on the share
  * @param {string} extraParams.password Password of the share (public links)
  * @param {string} extraParams.expireDate Expiry date of the share
@@ -112,8 +112,8 @@ const updateTimeOfLastShareOperation = function() {
     }
     params.append('shareWith', receiver)
   }
-  params.append('shareType', shareType)
-  params.append('permissions', permissions)
+  params.append('shareType', shareType.toString())
+  params.append('permissions', permissions.toString())
   if (name) {
     params.append('name', name)
   }
@@ -280,7 +280,7 @@ Given(
       SHARE_TYPES.public_link,
       permissions,
       null,
-      { password: password }
+      { password }
     )
   }
 )

@@ -1,7 +1,7 @@
-const { client } = require('../config.js')
 const ldap = require('ldapjs')
-const { join } = require('./path')
 const fs = require('fs-extra')
+const { join } = require('./path')
+const { client } = require('../config.js')
 
 const userHelper = require('./userSettings')
 
@@ -118,7 +118,7 @@ exports.createUser = async function (
       objectclass: ['posixAccount', 'inetOrgPerson'],
       homeDirectory: `/home/openldap/${user}`,
       userPassword: password,
-      displayName: displayName,
+      displayName,
       mail: email,
       gidNumber: 5000,
       uidNumber: uid,

@@ -18,8 +18,9 @@ class StepDef {
       throw new Error('Invalid token type')
     }
     pattern = pattern.toString()
-    this.type =
-      pattern.startsWith('/') && pattern.endsWith('/') ? patternTypes.REGEX : patternTypes.REGULAR
+    this.type = pattern.startsWith('/') && pattern.endsWith('/')
+        ? patternTypes.REGEX
+        : patternTypes.REGULAR
     this.token = token
     this.pattern = pattern
     this.action = action
@@ -29,7 +30,7 @@ class StepDef {
     if (this.type === patternTypes.REGEX) {
       return [this.pattern]
     }
-    const reg = RegExp(/([^\s]+\/\w*)/g) // eslint-disable-line no-useless-escape
+    const reg = /([^\s]+\/\w*)/g
     let steps = []
     const found = this.pattern.match(reg)
 
@@ -199,7 +200,7 @@ class Step {
 }
 
 function verifyMatchParams(pattern) {
-  const reg = RegExp(/(\d+|"([^\"]*)"|'([^\']*)')/g) // eslint-disable-line no-useless-escape
+  const reg = /(\d+|"([^"]*)"|'([^']*)')/g
   const data = []
   let found = pattern.match(reg)
 
@@ -208,7 +209,7 @@ function verifyMatchParams(pattern) {
   }
 
   for (const match of found) {
-    if (match[0] === '"' || match[0] === "'") {
+    if (match[0] === '"' || match[0] === '\'') {
       data.push(match.substring(1, match.length - 1))
     } else {
       data.push(match)

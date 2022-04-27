@@ -1,6 +1,7 @@
+/* eslint-disable jest/expect-expect */
+const assert = require('assert')
 const request = require('supertest')
 const app = require('../../src/app')
-const assert = require('assert')
 
 /**
  * following tests are interdependent with each other and ordered with reason

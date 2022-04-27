@@ -108,9 +108,9 @@ module.exports = {
       }
     } else {
       this.createdUsers[userId] = {
-        password: password,
-        displayname: displayname,
-        email: email,
+        password,
+        displayname,
+        email,
       }
     }
   },

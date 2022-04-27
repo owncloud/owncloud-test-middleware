@@ -1,18 +1,18 @@
-const { Given, Then } = require('../context')
 require('url-search-params-polyfill')
-const httpHelper = require('../helpers/httpHelper')
-const backendHelper = require('../helpers/backendHelper')
-const webdavHelper = require('../helpers/webdavHelper')
 const { xml2js } = require('xml-js')
 const _ = require('lodash')
 const assert = require('assert')
+const { Given, Then } = require('../context')
 const path = require('../helpers/path')
+const httpHelper = require('../helpers/httpHelper')
+const backendHelper = require('../helpers/backendHelper')
+const webdavHelper = require('../helpers/webdavHelper')
 
 /**
  * Check if file exists using webdav requests
  * @param {string} userId - username
  * @param {string} element - path
- * @returns {Promise<Response|Error>}
+ * @returns {node-fetch}
  */
  function fileExists(userId, element) {
   const davPath = webdavHelper.createDavPath(userId, element)
@@ -23,7 +23,7 @@ const path = require('../helpers/path')
  * request a single file
  * @param {string} userId - username
  * @param {string} element - path
- * @returns {Promise<Response|Error>}
+ * @returns {node-fetch}
  */
 function getFile(userId, element) {
   const davPath = webdavHelper.createDavPath(userId, element)

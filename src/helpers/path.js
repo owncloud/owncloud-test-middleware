@@ -1,9 +1,10 @@
-const join = require('join-path')
-const fs = require('fs')
 const _ = require('lodash/fp')
+const fs = require('fs')
+const join = require('join-path')
 const assert = require('assert')
 const normalize = _.replace(/^\/+|$/g, '')
 const parts = _.pipe(normalize, _.split('/'))
+
 const relativeTo = function (basePath, childPath) {
   basePath = normalize(basePath)
   childPath = normalize(childPath)
@@ -11,6 +12,7 @@ const relativeTo = function (basePath, childPath) {
   const basePathLength = basePath.length
   return childPath.slice(basePathLength)
 }
+
 const deleteFolderRecursive = function (path) {
   if (fs.existsSync(path)) {
     fs.readdirSync(path).forEach((file, index) => {

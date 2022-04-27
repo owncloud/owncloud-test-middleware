@@ -1,7 +1,7 @@
-const { When, Then } = require('../context')
 require('url-search-params-polyfill')
-const sharingHelper = require('../helpers/sharingHelper')
 const assert = require('assert')
+const { When, Then } = require('../context')
+const sharingHelper = require('../helpers/sharingHelper')
 const { SHARE_TYPES } = require('../helpers/sharingHelper')
 const path = require('../helpers/path')
 
