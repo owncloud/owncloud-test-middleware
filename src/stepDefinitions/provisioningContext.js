@@ -9,6 +9,7 @@ const codify = require('../helpers/codify')
 const httpHelper = require('../helpers/httpHelper')
 const ldap = require('../helpers/ldapHelper')
 const userSettings = require('../helpers/userSettings')
+const graph = require('../helpers/graphHelper')
 const sharingHelper = require('../helpers/sharingHelper')
 const { setConfigs, getActualSkeletonDir } = require('../helpers/config')
 
@@ -18,6 +19,8 @@ function createDefaultUser(userId, skeletonType) {
   const email = userSettings.getEmailAddressOfDefaultUser(userId)
   if (client.globals.ldap) {
     return ldap.createUser(client.globals.ldapClient, userId)
+  } else if (client.globals.graph) {
+    return graph.createUser(userId, password, displayname, email)
   }
   return createUser(userId, password, displayname, email, skeletonType)
 }
@@ -123,13 +126,21 @@ async function createUserWithAttributes(
 
 function deleteUser(userId) {
   userSettings.deleteUserFromCreatedUsersList(userId)
-  const url = encodeURI(`cloud/users/${userId}`)
-  return httpHelper.deleteOCS(url)
+  if (client.globals.graph) {
+    return graph.deleteUser(userId)
+  } else {
+    const url = encodeURI(`cloud/users/${userId}`)
+    return httpHelper.deleteOCS(url)
+  }
 }
 
 function initUser(userId) {
-  const url = encodeURI(`cloud/users/${userId}`)
-  return httpHelper.getOCS(url, userId)
+  if (client.globals.graph) {
+    return graph.getUser(userId)
+  } else {
+    const url = encodeURI(`cloud/users/${userId}`)
+    return httpHelper.getOCS(url, userId)
+  }
 }
 
 function editUser(userId, key, value) {

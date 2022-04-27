@@ -95,6 +95,22 @@ const requestEndpoint = function (path, params, userId = 'admin', header = {}) {
  * @param {string} path
  * @param {object} params
  * @param {string} userId
+ * @param {object} header
+ *
+ * @returns {node-fetch}
+ */
+const requestGraphEndpoint = function (path, params, userId = 'admin', header = {}) {
+  const headers = { ...createAuthHeader(userId), ...header }
+  const options = { ...params, headers }
+  const url = join(backendHelper.getCurrentBackendUrl(), 'graph/v1.0', path)
+  return fetcher(url, options)
+}
+
+/**
+ *
+ * @param {string} path
+ * @param {object} params
+ * @param {string} userId
  * @param {string} pass
  * @param {object} headers
  *
@@ -164,5 +180,12 @@ module.exports = {
   proppatch: (url, userId, body, header) =>
     requestEndpoint(url, { body, method: 'PROPPATCH' }, userId, header),
   lock: (url, userId, body, header) =>
-      requestEndpoint(url, { body, method: 'LOCK' }, userId, header)
+    requestEndpoint(url, { body, method: 'LOCK' }, userId, header),
+  // graph Api requests
+  postGraph: (url, userId, body, header) =>
+    requestGraphEndpoint(url, { body, method: 'POST' }, userId, header),
+  deleteGraph: (url, userId, body, header) =>
+    requestGraphEndpoint(url, { body, method: 'DELETE' }, userId, header),
+  getGraph: (url, userId, body, header) =>
+    requestGraphEndpoint(url, { body, method: 'GET' }, userId, header),
 }
