@@ -19,7 +19,7 @@ function createDefaultUser(userId, skeletonType) {
   const email = userSettings.getEmailAddressOfDefaultUser(userId)
   if (client.globals.ldap) {
     return ldap.createUser(client.globals.ldapClient, userId)
-  } else if (client.globals.idm) {
+  } else if (client.globals.graph) {
     return graph.createUser(userId, password, displayname, email)
   }
   return createUser(userId, password, displayname, email, skeletonType)
@@ -126,7 +126,7 @@ async function createUserWithAttributes(
 
 function deleteUser(userId) {
   userSettings.deleteUserFromCreatedUsersList(userId)
-  if (client.globals.idm) {
+  if (client.globals.graph) {
     return graph.deleteUser(userId)
   } else {
     const url = encodeURI(`cloud/users/${userId}`)
@@ -135,7 +135,7 @@ function deleteUser(userId) {
 }
 
 function initUser(userId) {
-  if (client.globals.idm) {
+  if (client.globals.graph) {
     return graph.getUser(userId)
   } else {
     const url = encodeURI(`cloud/users/${userId}`)

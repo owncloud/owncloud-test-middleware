@@ -139,6 +139,11 @@ Note: the `testing` app is not available on oCIS. When such steps are used again
 | `LDAP_ADMIN_PASSWORD`  | admin password of the ldap server | admin |
 | `LDAP_BASE_DN` | base DN of the admin server | cn=admin,dc=owncloud,dc=com |
 
+#### Graph Specific config variables
+| setting | meaning | default |
+| -- | -- | -- |
+| `TEST_WITH_GRAPH_API` | use graph api to create users | false |
+
 ### Starting the server
 To start the middleware server change into the checkout directory of owncloud-test-middleware and use the following commands
 ```
