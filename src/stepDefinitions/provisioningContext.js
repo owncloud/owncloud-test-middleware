@@ -19,8 +19,7 @@ function createDefaultUser(userId, skeletonType) {
   const email = userSettings.getEmailAddressOfDefaultUser(userId)
   if (client.globals.ldap) {
     return ldap.createUser(client.globals.ldapClient, userId)
-  }
-  else if (client.globals.idm) {
+  } else if (client.globals.idm) {
     return graph.createUser(userId, password, displayname, email)
   }
   return createUser(userId, password, displayname, email, skeletonType)

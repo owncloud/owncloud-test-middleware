@@ -2,7 +2,7 @@ const httpHelper = require('./httpHelper')
 const userHelper = require('./userSettings')
 
 
-exports.createUser = async function (
+exports.createUser = function (
     user,
     password = null,
     displayName = null,
@@ -13,10 +13,10 @@ exports.createUser = async function (
     password = password || userHelper.getPasswordForUser(user)
 
     const body = JSON.stringify({
-        'displayName': displayName,
-        'mail': email,
-        'onPremisesSamAccountName': user,
-        'passwordProfile': { 'password': password }
+        displayName,
+        mail: email,
+        onPremisesSamAccountName: user,
+        passwordProfile: { password }
     })
 
     console.log('step2 - create')
@@ -25,14 +25,14 @@ exports.createUser = async function (
         .then(res => httpHelper.checkStatus(res, 'Failed while creating user'))
 }
 
-exports.deleteUser = async function (user) {
+exports.deleteUser = function (user) {
     console.log('step1 - delete')
     return httpHelper
         .deleteGraph(`users/${user}`, 'admin')
         .then(res => httpHelper.checkStatus(res, 'Failed while deleting user'))
 }
 
-exports.getUser = async function (user) {
+exports.getUser = function (user) {
     console.log('step3 - init')
     return httpHelper
         .getGraph(`users/${user}`, 'admin')
