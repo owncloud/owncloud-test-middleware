@@ -166,6 +166,8 @@ function createGroup(groupId) {
         userSettings.addGroupToCreatedGroupsList(groupId)
       }
     })
+  } else if (client.globals.graph) {
+    return graph.createGroup(groupId)
   }
   const body = new URLSearchParams()
   body.append('groupid', groupId)
@@ -180,14 +182,20 @@ function createGroup(groupId) {
  * @returns {*|Promise}
  */
 function deleteGroup(groupId) {
-  userSettings.deleteGroupFromCreatedGroupsList(groupId)
-  const url = encodeURI(`cloud/groups/${groupId}`)
-  return httpHelper.deleteOCS(url)
+  if (client.globals.graph) {
+    return graph.deleteGroup(groupId)
+  } else {
+    userSettings.deleteGroupFromCreatedGroupsList(groupId)
+    const url = encodeURI(`cloud/groups/${groupId}`)
+    return httpHelper.deleteOCS(url)
+  }
 }
 
 function addToGroup(userId, groupId) {
   if (client.globals.ldap) {
     return ldap.addUserToGroup(client.globals.ldapClient, userId, groupId)
+  } else if (client.globals.graph) {
+    return graph.addToGroup(userId, groupId)
   }
   const body = new URLSearchParams()
   body.append('groupid', groupId)
