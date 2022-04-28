@@ -1,3 +1,15 @@
+## Changelog for [1.5.0] (2022-4-27)
+The following sections list the changes for 1.5.0
+
+[1.5.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.4.0...v1.5.0
+
+### Summary
+- Creating a user via graph Api by @ScharfViktor in https://github.com/owncloud/owncloud-test-middleware/pull/107
+- Add content to file in Folder,with,coma by @pascalwengerter in https://github.com/owncloud/owncloud-test-middleware/pull/109
+- Fix lint and lint packages by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/106
+- [enhancement] Adjust express endpoints by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/108
+- encode uri for the provisioning urls by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/105
+
 ## Changelog for [1.4.0] (2022-02-16)
 
 The following sections list the changes for 1.4.0
