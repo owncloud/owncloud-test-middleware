@@ -118,7 +118,11 @@ async function createUserWithAttributes(
 ) {
   password = password || userSettings.getPasswordForUser(username)
   await deleteUser(username)
-  await createUser(username, password, displayname, email, skeletonType)
+  if (client.globals.graph) {
+    return graph.createUser(username, password, displayname, email)
+  } else {
+    await createUser(username, password, displayname, email, skeletonType)
+  }
   if (initialize) {
     await initUser(username)
   }

@@ -63,7 +63,8 @@ async function getGroupId(group) {
         .then(res => res.json())
 
     for (const key in response.value) {
-        if (response.value[key].displayName === group) {
+        if (response.value[key].displayName.toLowerCase() === group.toLowerCase()) {
+            console.log(response.value[key].id)
             return response.value[key].id
         }
     }
