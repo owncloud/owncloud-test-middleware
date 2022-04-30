@@ -1,3 +1,11 @@
+## Changelog for [1.6.0] (2022-4-29)
+The following sections list the changes for 1.6.0
+
+[1.6.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.5.0...v1.6.0
+
+### Summary
+- Creating group and adding member to group via GraphApi by @ScharfViktor in https://github.com/owncloud/owncloud-test-middleware/pull/113
+
 ## Changelog for [1.5.0] (2022-4-27)
 The following sections list the changes for 1.5.0
 
