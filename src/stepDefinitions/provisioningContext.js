@@ -165,13 +165,17 @@ function editUser(userId, key, value) {
  */
 function createGroup(groupId) {
   if (client.globals.ldap) {
-    return ldap.createGroup(client.globals.ldapClient, groupId).then(err => {
-      if (!err) {
+    return ldap.createGroup(client.globals.ldapClient, groupId).then(res => {
+      if (res.status === 200) {
         userSettings.addGroupToCreatedGroupsList(groupId)
       }
     })
   } else if (client.globals.graph) {
-    return graph.createGroup(groupId)
+    return graph.createGroup(groupId).then(res => {
+      if (res.status === 200) {
+        userSettings.addGroupToCreatedGroupsList(groupId)
+      }
+    })
   }
   const body = new URLSearchParams()
   body.append('groupid', groupId)
@@ -187,7 +191,11 @@ function createGroup(groupId) {
  */
 function deleteGroup(groupId) {
   if (client.globals.graph) {
-    return graph.deleteGroup(groupId)
+    return graph.deleteGroup(groupId).then(res => {
+      if (res.status === 204) {
+        userSettings.deleteGroupFromCreatedGroupsList(groupId)
+      }
+    })
   } else {
     userSettings.deleteGroupFromCreatedGroupsList(groupId)
     const url = encodeURI(`cloud/groups/${groupId}`)
