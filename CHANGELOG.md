@@ -1,3 +1,19 @@
+## Changelog for [1.8.0] (2022-08-01)
+The following sections list the changes for 1.8.0
+
+[1.8.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.7.0...v1.8.0
+
+### Summary
+- Add created group to the array by @SwikritiT in [#118](https://github.com/owncloud/owncloud-test-middleware/pull/118)
+
+## Changelog for [1.7.0] (2022-05-31)
+The following sections list the changes for 1.7.0
+
+[1.7.0]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.6.0...v1.7.0
+
+### Summary
+- [tests-only]Test for depth 1 instead of instead of infinty by @SagarGi in [#117](https://github.com/owncloud/owncloud-test-middleware/pull/117)
+
 ## Changelog for [1.6.0] (2022-4-29)
 The following sections list the changes for 1.6.0
 
