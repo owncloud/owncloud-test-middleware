@@ -21,10 +21,14 @@ exports.createUser = function (
         onPremisesSamAccountName: user,
         passwordProfile: { password }
     })
-    userSettings.addUserToCreatedUsersList(user, password, displayName, email)
     return httpHelper
         .postGraph('users', 'admin', body)
-        .then(res => httpHelper.checkStatus(res, 'Failed while creating user'))
+        .then((res) => {
+            httpHelper.checkStatus(res, 'Failed while creating user')
+            if (res.status === 200) {
+                userSettings.addUserToCreatedUsersList(user, password, displayName, email)
+            }
+        })
 }
 
 exports.deleteUser = function (user) {
