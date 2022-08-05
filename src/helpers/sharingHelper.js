@@ -253,7 +253,7 @@ module.exports = {
     return httpHelper
       .getOCS(apiURL, user)
       .then((res) => {
-        httpHelper.checkStatus(res, 'The response status is not the expected value')
+        httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to getting all shares.')
         return res.json()
       })
       .then((res) => {
@@ -273,7 +273,7 @@ module.exports = {
     return httpHelper
       .getOCS(apiURL, user)
       .then((res) => {
-        httpHelper.checkStatus(res, 'The response status is not the expected value')
+        httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to getting all pending federated shares.')
         return res.json()
       })
       .then((res) => {
@@ -326,7 +326,7 @@ module.exports = {
       return httpHelper
           .deleteOCS(apiURL, user)
           .then((res) => {
-            res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+            res = httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to declining share.')
             return res.json()
           })
           .then((res) => {
@@ -380,7 +380,7 @@ module.exports = {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
       return httpHelper.postOCS(apiURL, user).then((res) => {
-        res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+        res = httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to accepting share.')
         if (client.globals.ocis) return res.text()
         return res.json()
       })
@@ -400,7 +400,7 @@ module.exports = {
     return httpHelper
       .deleteOCS(apiURL, user)
       .then((res) => {
-        res = httpHelper.checkStatus(res, 'The response status is not the expected value')
+        res = httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to deleting share.')
         console.log('deleted Share')
         return res.json()
       })
@@ -425,7 +425,7 @@ module.exports = {
     return httpHelper
       .postOCS(apiURL, user)
       .then((res) => {
-        return httpHelper.checkStatus(res, 'The response status is not the expected value')
+        return httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to accepting pending share.')
       })
       .then((res) => res.json())
       .then((res) => {
