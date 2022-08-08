@@ -1,3 +1,11 @@
+## Changelog for [1.8.1] (2022-08-05)
+The following sections list the changes for 1.8.1
+
+[1.8.1]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.0...v1.8.1
+
+### Summary
+- Fix user cleanup after tests finish @amrita-shrestha  [#121](https://github.com/owncloud/owncloud-test-middleware/pull/121)
+
 ## Changelog for [1.8.0] (2022-08-01)
 The following sections list the changes for 1.8.0
 
