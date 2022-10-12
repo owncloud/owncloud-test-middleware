@@ -303,7 +303,7 @@ module.exports = {
       const splitPath = element.path.split('/')
       const resourceAtEndOfPath = splitPath[splitPath.length - 1]
       return (
-          element.state === this.SHARE_STATE.pending &&
+        element.state === this.SHARE_STATE.pending &&
           resourceAtEndOfPath === filename &&
           element.uid_owner === sharer
       )
@@ -324,14 +324,14 @@ module.exports = {
       const shareID = element.id
       const apiURL = `apps/files_sharing/api/v1/shares/pending/${shareID}`
       return httpHelper
-          .deleteOCS(apiURL, user)
-          .then((res) => {
-            res = httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to declining share.')
-            return res.json()
-          })
-          .then((res) => {
-            httpHelper.checkOCSStatus(res, 'Could not perform the decline action')
-          })
+        .deleteOCS(apiURL, user)
+        .then((res) => {
+          res = httpHelper.checkStatus(res, 'The HTTP response status is not the expected value in response to declining share.')
+          return res.json()
+        })
+        .then((res) => {
+          httpHelper.checkOCSStatus(res, 'Could not perform the decline action')
+        })
     }
   },
 
@@ -359,7 +359,7 @@ module.exports = {
       const splitPath = element.path.split('/')
       const resourceAtEndOfPath = splitPath[splitPath.length - 1]
       return (
-          element.state === this.SHARE_STATE.pending &&
+        element.state === this.SHARE_STATE.pending &&
           resourceAtEndOfPath === filename &&
           element.uid_owner === sharer
       )

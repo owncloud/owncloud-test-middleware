@@ -14,7 +14,7 @@ const webdavHelper = require('../helpers/webdavHelper')
  * @param {string} element - path
  * @returns {node-fetch}
  */
- function fileExists(userId, element) {
+function fileExists(userId, element) {
   const davPath = webdavHelper.createDavPath(userId, element)
   return httpHelper.propfind(davPath, userId)
 }
