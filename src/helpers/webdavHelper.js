@@ -137,49 +137,49 @@ exports.propfind = function (path, userId, properties, folderDepth = '1') {
 exports.getTrashBinElements = function (user, depth = '1') {
   return new Promise((resolve, reject) => {
     exports
-        .propfind(
-            `/trash-bin/${user}`,
-            user,
-            [
-              'oc:trashbin-original-filename',
-              'oc:trashbin-original-location',
-              'oc:trashbin-delete-timestamp',
-              'd:getlastmodified'
-            ],
-            depth
-        )
-        .then((str) => {
-          try {
-            let trashData = convert.xml2js(str, { compact: true })['d:multistatus']['d:response']
-            const trashItems = []
-            // 'trashData' gets object instead of array when there are not any files/folders in the trashbin
-            // so trashData.map() will cause error if trashData gets object
-            // following wraps the object in array
-            if (!Array.isArray(trashData)) {
-              trashData = [trashData]
-            }
-            trashData.forEach((trash) => {
-              if (trash['d:propstat']['d:prop'] === undefined) {
-                reject(new Error('trashbin data not defined'))
-              } else {
-                trashItems.push({
-                  href: trash['d:href']._text,
-                  originalFilename:
-                  trash['d:propstat']['d:prop']['oc:trashbin-original-filename']._text,
-                  originalLocation:
-                  trash['d:propstat']['d:prop']['oc:trashbin-original-location']._text,
-                  deleteTimestamp:
-                  trash['d:propstat']['d:prop']['oc:trashbin-delete-timestamp']._text,
-                  lastModified: trash['d:propstat']['d:prop']['d:getlastmodified']._text
-                })
-              }
-            })
-            resolve(trashItems)
-          } catch (err) {
-            // Trying to read the nested properties can crash the test
-            reject(err)
+      .propfind(
+        `/trash-bin/${user}`,
+        user,
+        [
+          'oc:trashbin-original-filename',
+          'oc:trashbin-original-location',
+          'oc:trashbin-delete-timestamp',
+          'd:getlastmodified'
+        ],
+        depth
+      )
+      .then((str) => {
+        try {
+          let trashData = convert.xml2js(str, { compact: true })['d:multistatus']['d:response']
+          const trashItems = []
+          // 'trashData' gets object instead of array when there are not any files/folders in the trashbin
+          // so trashData.map() will cause error if trashData gets object
+          // following wraps the object in array
+          if (!Array.isArray(trashData)) {
+            trashData = [trashData]
           }
-        })
+          trashData.forEach((trash) => {
+            if (trash['d:propstat']['d:prop'] === undefined) {
+              reject(new Error('trashbin data not defined'))
+            } else {
+              trashItems.push({
+                href: trash['d:href']._text,
+                originalFilename:
+                  trash['d:propstat']['d:prop']['oc:trashbin-original-filename']._text,
+                originalLocation:
+                  trash['d:propstat']['d:prop']['oc:trashbin-original-location']._text,
+                deleteTimestamp:
+                  trash['d:propstat']['d:prop']['oc:trashbin-delete-timestamp']._text,
+                lastModified: trash['d:propstat']['d:prop']['d:getlastmodified']._text
+              })
+            }
+          })
+          resolve(trashItems)
+        } catch (err) {
+          // Trying to read the nested properties can crash the test
+          reject(err)
+        }
+      })
   })
 }
 
@@ -193,8 +193,8 @@ exports.createFolder = async function (user, folderName) {
   const davPath = exports.createDavPath(user, folderName)
   const mkcolResponse = await httpHelper.mkcol(davPath, user)
   const statusResponse = await httpHelper.checkStatus(
-      mkcolResponse,
-      `Could not create the folder "${folderName}" for user "${user}".`
+    mkcolResponse,
+    `Could not create the folder "${folderName}" for user "${user}".`
   )
   return statusResponse.text()
 }
@@ -221,8 +221,8 @@ exports.createFile = async function (user, fileName, contents = '') {
   }
   const putResponse = await httpHelper.put(davPath, user, contents)
   const statusResponse = await httpHelper.checkStatus(
-      putResponse,
-      `Could not create the file "${fileName}" for user "${user}".`
+    putResponse,
+    `Could not create the file "${fileName}" for user "${user}".`
   )
   uploadTimeStamps[user] = uploadTimeStamps[user] || {}
   uploadTimeStamps[user][fileName] = Date.now()

@@ -61,14 +61,14 @@ When(
 /**
  * makes sure share operations are carried out maximum once a second to avoid same stime
  */
- const waitBetweenShareOperations = function() {
+const waitBetweenShareOperations = function() {
   const timeSinceLastShare = Date.now() - timeOfLastShareOperation
   if (timeSinceLastShare <= 1001) {
     return new Promise(resolve => {
       setTimeout(resolve, 1001 - timeSinceLastShare)
     })
   }
- }
+}
 
 /**
  * update time in which the last share operation was carried out
@@ -91,7 +91,7 @@ const updateTimeOfLastShareOperation = function() {
  * @param {string} extraParams.password Password of the share (public links)
  * @param {string} extraParams.expireDate Expiry date of the share
  */
- const shareFileFolder = async function(
+const shareFileFolder = async function(
   elementToShare,
   sharer,
   receiver = null,
@@ -141,7 +141,7 @@ const updateTimeOfLastShareOperation = function() {
  *
  * @return void
  */
- Given('user {string} has created a new share with following settings', function(sharer, dataTable) {
+Given('user {string} has created a new share with following settings', function(sharer, dataTable) {
   const settings = dataTable.rowsHash()
   const expireDate = settings.expireDate
   let dateToSet = ''
@@ -179,7 +179,7 @@ const updateTimeOfLastShareOperation = function() {
  * @param {string} data.permissions Allowed permissions on the share
  * @param {string} data.expireDate Expiry date of the share
  */
- const createPublicLink = function(sharer, data) {
+const createPublicLink = function(sharer, data) {
   let { path, permissions = 'read', name, password, expireDate } = data
 
   if (typeof expireDate !== 'undefined') {

@@ -246,12 +246,12 @@ module.exports = {
    */
   getCreatedUsers: function (server = BACKENDS.local) {
     switch (server) {
-      case BACKENDS.local:
-        return this.createdUsers
-      case BACKENDS.remote:
-        return this.createdRemoteUsers
-      default:
-        throw new Error('Invalid value for server. want = "REMOTE"/"LOCAL", got = ' + server)
+    case BACKENDS.local:
+      return this.createdUsers
+    case BACKENDS.remote:
+      return this.createdRemoteUsers
+    default:
+      throw new Error('Invalid value for server. want = "REMOTE"/"LOCAL", got = ' + server)
     }
   },
   /**

@@ -106,19 +106,19 @@ function getActualSkeletonDir(skeletonType) {
   let directoryName
 
   switch (skeletonType) {
-    case 'large':
-      directoryName = 'webUISkeleton'
-      break
-    case 'small':
-      directoryName = 'apiSkeleton'
-      break
-    case 'without':
-      // "tinySkeleton" is an empty folder
-      directoryName = 'tinySkeleton'
-      break
-    default:
-      directoryName = false
-      break
+  case 'large':
+    directoryName = 'webUISkeleton'
+    break
+  case 'small':
+    directoryName = 'apiSkeleton'
+    break
+  case 'without':
+    // "tinySkeleton" is an empty folder
+    directoryName = 'tinySkeleton'
+    break
+  default:
+    directoryName = false
+    break
   }
   return directoryName
 }

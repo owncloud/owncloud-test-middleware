@@ -13,6 +13,7 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   rules: {
+    indent: ['error', 2],
     'require-await': 'warn',
     'no-new': 'off',
     'jest/no-standalone-expect': 'off',
@@ -33,10 +34,9 @@ module.exports = {
     'comma-dangle': 'off',
     quotes: ['error', 'single'],
     'no-multiple-empty-lines': 'off',
-    indent: 'off',
     'eol-last': 'off',
   },
   plugins: [
-      'jest'
+    'jest'
   ]
 }
