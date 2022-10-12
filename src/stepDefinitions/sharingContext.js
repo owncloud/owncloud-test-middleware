@@ -286,16 +286,10 @@ Given(
 )
 
 Given('the administrator has enabled exclude groups from sharing', function() {
-  if (client.globals.ocis) {
-    return
-  }
   return runOcc(['config:app:set core shareapi_exclude_groups --value=yes'])
 })
 
 Given('the administrator has excluded group {string} from sharing', async function(group) {
-  if (client.globals.ocis) {
-    return
-  }
   const configList = await runOcc(['config:list'])
   const config = _.get(configList, 'ocs.data.stdOut')
   const configParsed = JSON.parse(config)
@@ -318,9 +312,6 @@ Given('the administrator has excluded group {string} from sharing', async functi
 Given(
   'the administrator has set the minimum characters for sharing autocomplete to {string}',
   function(value) {
-    if (client.globals.ocis) {
-      return
-    }
     return runOcc(['config:system:set user.search_min_length --value=' + value])
   }
 )
@@ -333,9 +324,6 @@ Given('user {string} has created a public link with following settings', functio
 })
 
 Given('the administrator has excluded group {string} from receiving shares', async function(group) {
-  if (client.globals.ocis) {
-    return
-  }
   const configList = await runOcc(['config:list'])
   const config = _.get(configList, 'ocs.data.stdOut')
   const configParsed = JSON.parse(config)

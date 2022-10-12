@@ -1,4 +1,5 @@
 const httpHelper = require('../helpers/httpHelper')
+const { client } = require('../config')
 
 /**
  * Run occ command using the testing API
@@ -6,6 +7,9 @@ const httpHelper = require('../helpers/httpHelper')
  * @param {Array} args
  */
 exports.runOcc = function (args) {
+  if (client.globals.ocis) {
+    return
+  }
   const params = new URLSearchParams()
   params.append('command', args.join(' '))
   const apiURL = 'apps/testing/api/v1/occ'
