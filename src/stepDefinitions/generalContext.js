@@ -11,10 +11,6 @@ Given('the setting {string} of app {string} has been set to {string}', function(
   app,
   value
 ) {
-  if (client.globals.ocis) {
-    // TODO: decide if we fail on OCIS when a scenario even tries to use this given step
-    return
-  }
   return occHelper.runOcc(['config:app:set', app, setting, '--value=' + value])
 })
 
@@ -32,18 +28,10 @@ Given('the setting {string} of app {string} has been set to {string} on remote s
 })
 
 Given('the administrator has cleared the versions for user {string}', function(userId) {
-  if (client.globals.ocis) {
-    // TODO: decide if we fail on OCIS when a scenario even tries to use this given step
-    return
-  }
   return occHelper.runOcc(['versions:cleanup', userId])
 })
 
 Given('the administrator has cleared the versions for all users', function() {
-  if (client.globals.ocis) {
-    // TODO: decide if we fail on OCIS when a scenario even tries to use this given step
-    return
-  }
   return occHelper.runOcc(['versions:cleanup'])
 })
 
@@ -84,18 +72,10 @@ After(async function(testCase) {
 // })
 
 Given('the app {string} has been disabled', function(app) {
-  if (client.globals.ocis) {
-    // TODO: decide if we fail on OCIS when a scenario even tries to use this given step
-    return
-  }
   return occHelper.runOcc(['app:disable', app])
 })
 
 Given('default expiration date for users is set to {int} day/days', function(days) {
-  if (client.globals.ocis) {
-    // TODO: decide if we fail on OCIS when a scenario even tries to use this given step
-    return
-  }
   occHelper.runOcc([`config:app:set --value ${days} core shareapi_expire_after_n_days_user_share`])
 
   return this
