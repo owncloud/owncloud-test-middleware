@@ -1,3 +1,12 @@
+## Changelog for [1.8.2] (2022-10-17)
+The following sections list the changes for 1.8.2
+
+[1.8.2]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.1...v1.8.2
+
+### Summary
+- [lint] set indentation rule by @kiranparajuli589 in https://github.com/owncloud/owncloud-test-middleware/pull/125
+- [tests-only]Refactor occ related step for ocis by @amrita-shrestha in https://github.com/owncloud/owncloud-test-middleware/pull/124
+
 ## Changelog for [1.8.1] (2022-08-05)
 The following sections list the changes for 1.8.1
 
