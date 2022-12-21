@@ -10,7 +10,7 @@ module.exports = {
     'plugin:jest/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 2021
   },
   rules: {
     indent: ['error', 2],
