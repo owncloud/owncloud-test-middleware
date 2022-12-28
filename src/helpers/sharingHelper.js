@@ -72,8 +72,7 @@ module.exports = {
         '-' +
         String(date.getMonth() + 1).padStart(2, '0') +
         '-' +
-        String(date.getDate()).padStart(2, '0') +
-        ' 00:00:00'
+        String(date.getDate()).padStart(2, '0')
     }
     return dateString
   },
@@ -129,6 +128,7 @@ module.exports = {
                 .toString()
             } else if (expectedDetail.field === 'expiration') {
               expectedDetail.value = sharingHelper.calculateDate(expectedDetail.value)
+              share[expectedDetail.field] = share[expectedDetail.field].toString().split(' ')[0]
             }
 
             if (
