@@ -1,3 +1,12 @@
+## Changelog for [1.8.3] (2022-12-29)
+The following sections list the changes for 1.8.3
+
+[1.8.3]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.2...v1.8.3
+
+### Summary
+- Strip time from expiration date by @saw-jan in https://github.com/owncloud/owncloud-test-middleware/pull/129
+- Pin node to version v16.3 and eslint parser to ecma2021 by @saw-jan in https://github.com/owncloud/owncloud-test-middleware/pull/128
+
 ## Changelog for [1.8.2] (2022-10-17)
 The following sections list the changes for 1.8.2
 
