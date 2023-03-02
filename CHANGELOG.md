@@ -1,3 +1,11 @@
+## Changelog for [1.8.5] (2023-03-02)
+The following sections list the changes for 1.8.5
+
+[1.8.5]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.4...v1.8.5
+
+### Summary
+- multiple retries webdav download on 425 status code by @kulmann in https://github.com/owncloud/owncloud-test-middleware/pull/134
+
 ## Changelog for [1.8.4] (2023-03-02)
 The following sections list the changes for 1.8.4
 
