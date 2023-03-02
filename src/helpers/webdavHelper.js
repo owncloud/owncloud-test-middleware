@@ -32,7 +32,7 @@ exports.download = async function (userId, file) {
   if ([423, 425].includes(res.status)) {
     if (res.status === 423) {
       console.info('Resource is locked. Retrying...')
-    } else if(res.status === 425) {
+    } else if (res.status === 425) {
       console.info('Resource is in postprocessing. Retrying...')
     }
     res = await new Promise((resolve) => {
