@@ -29,11 +29,13 @@ exports.download = async function (userId, file) {
   let res = await httpHelper.get(davPath, userId)
 
   // wait for 500ms and retry download if the resource is locked or in postprocessing
-  if ([423, 425].includes(res.status)) {
+  let retryCounter = 0
+  const isRetryAllowed = () => retryCounter++ < 10 && [423, 425].includes(res.status)
+  while (isRetryAllowed()) {
     if (res.status === 423) {
-      console.info('Resource is locked. Retrying...')
+      console.info(`Resource is locked. Retrying (${retryCounter})...`)
     } else if (res.status === 425) {
-      console.info('Resource is in postprocessing. Retrying...')
+      console.info(`Resource is in postprocessing. Retrying (${retryCounter})...`)
     }
     res = await new Promise((resolve) => {
       setTimeout(async () => {
