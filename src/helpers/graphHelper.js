@@ -25,7 +25,7 @@ exports.createUser = function (
     .postGraph('users', 'admin', body)
     .then((res) => {
       httpHelper.checkStatus(res, 'Failed while creating user')
-      if (res.status === 200) {
+      if (res.status === 201) {
         userSettings.addUserToCreatedUsersList(user, password, displayName, email)
       }
     })
