@@ -1,3 +1,12 @@
+## Changelog for [1.8.6] (2023-11-15)
+The following sections list the changes for 1.8.6
+
+[1.8.6]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.5...v1.8.6
+
+### Summary
+- fix response code by @ScharfViktor in https://github.com/owncloud/owncloud-test-middleware/pull/137
+- update docker plugin by @ScharfViktor https://github.com/owncloud/owncloud-test-middleware/pull/138
+
 ## Changelog for [1.8.5] (2023-03-02)
 The following sections list the changes for 1.8.5
 
