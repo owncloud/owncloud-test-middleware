@@ -172,7 +172,7 @@ function createGroup(groupId) {
     })
   } else if (client.globals.graph) {
     return graph.createGroup(groupId).then(res => {
-      if (res.status === 200) {
+      if (res.status === 201) {
         userSettings.addGroupToCreatedGroupsList(groupId)
       }
     })
