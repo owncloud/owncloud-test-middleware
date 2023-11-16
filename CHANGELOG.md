@@ -1,3 +1,11 @@
+## Changelog for [1.8.7] (2023-11-16)
+The following sections list the changes for 1.8.7
+
+[1.8.7]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.6...v1.8.7
+
+### Summary
+- Update the status code expectation for create group @SwikritiT in https://github.com/owncloud/owncloud-test-middleware/pull/140
+
 ## Changelog for [1.8.6] (2023-11-15)
 The following sections list the changes for 1.8.6
 
