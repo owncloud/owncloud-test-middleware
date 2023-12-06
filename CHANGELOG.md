@@ -1,3 +1,11 @@
+## Changelog for [1.8.8] (2023-12-06)
+The following sections list the changes for 1.8.8
+
+[1.8.8]: https://github.com/owncloud/owncloud-test-middleware/compare/v1.8.7...v1.8.8
+
+### Summary
+- Make webdavContext.getResourceType more resilient @dschmidt in https://github.com/owncloud/owncloud-test-middleware/pull/142
+
 ## Changelog for [1.8.7] (2023-11-16)
 The following sections list the changes for 1.8.7
 

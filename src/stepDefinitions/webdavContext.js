@@ -49,16 +49,24 @@ const fileShouldNotHaveContent = async function(userId, file, content) {
 }
 
 const getResourceType = function(data) {
-  let resourceType
-
   const result = xml2js(data, { compact: true })
   const responses = _.get(result, 'd:multistatus.d:response')
+  let response
   if (responses instanceof Array) {
-    resourceType = _.get(responses[0], 'd:propstat.d:prop.d:resourcetype')
+    response = responses[0]
   } else {
-    resourceType = _.get(responses, 'd:propstat.d:prop.d:resourcetype')
+    response = responses
   }
 
+  const propstats = response['d:propstat']
+  let propstat
+  if (propstats instanceof Array) {
+    propstat = propstats[0]
+  } else {
+    propstat = propstats
+  }
+
+  const resourceType = _.get(propstat, 'd:prop.d:resourcetype')
   if (Object.keys(resourceType)[0] === 'd:collection') {
     return 'folder'
   } else {
