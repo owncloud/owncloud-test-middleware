@@ -16,15 +16,14 @@ module.exports = {
     update: 2,
     create: 4,
     delete: 8,
-    share: 16,
-    all: 31,
+    all: 15,
   }),
   SHARE_STATE: Object.freeze({
     accepted: 0,
     pending: 1,
     declined: 2,
   }),
-  COLLABORATOR_PERMISSION_ARRAY: ['share', 'update', 'create', 'delete'],
+  COLLABORATOR_PERMISSION_ARRAY: ['update', 'create', 'delete'],
   /**
    *
    * @param permissionsString string of permissions separated by comma. For valid permissions see this.PERMISSION_TYPES
